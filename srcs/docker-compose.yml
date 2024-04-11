@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:latest
+    container_name: db
+    ports:
+        - "5432:5432"
+    expose:
+      - 5432
+    networks:
+        - trans-network
+    env_file: ../.env
+    volumes:
+        - db-v:/var/lib/postgresql/data
+    restart: unless-stopped
+  django:
+    container_name: django
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    env_file: ../.env
+    networks:
+      - trans-network
+    volumes:
+      - django-v:/home/django/ft_transcendence
+    restart: unless-stopped
+  
+volumes:
+  django-v:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${PWD}/srcs/django/ft_transcendence"
+  db-v:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${PWD}/srcs/data/db"
+
+networks:
+  trans-network:
+    driver: bridge
