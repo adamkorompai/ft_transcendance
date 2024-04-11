@@ -5,7 +5,7 @@ This is our readme.md about ft_transcendence!
 Django version 4.2.7
 
 [TEAM]
-	- By using volumes you can launch the project and work on it in the same time.
+- By using volumes you can launch the project and work on it in the same time.
 
 [USEFULL COMMANDS]
 	- python3 manage.py createsuperuser
