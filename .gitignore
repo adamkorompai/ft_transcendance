@@ -1,0 +1,19 @@
+# General
+.env
+*.DS_Store
+
+*/migrations/*
+!*/migrations/__init__.py
+
+table.txt
+./srcs/data
+
+# Django specific
+__pycache__/
+*.pyc
+*.py[cod]
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
