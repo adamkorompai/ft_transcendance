@@ -16,7 +16,7 @@
 		{% block script %}{% endblock %}
 	</head>
 	<body hx-headers='{"X-CSRFToken": "{% csrf_token %}"}' id="app-body">
-		{% include './navbar.html' %}
+		{% include './nav.html' %}
 		<main id="app-root" class="container_global">
 			{% if show_alerts %}
 				{% if messages %}

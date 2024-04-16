@@ -7,4 +7,31 @@
 
 {% block body %}
 	<h1>Home page</h1>
+	<br>
+	<section class="table_header">
+		<h3>Leaderboard</h3>
+	</section>
+	<section class="table_body">
+		<table>
+			<thead>
+				<tr>
+					<th>Rank</th>
+					<th>Player</th>
+					<th>Score</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for user in all_users %}
+					<tr>
+						<td>{{ forloop.counter }}</td>
+						<td>
+							<img src="{{ user.profile.image.url }}" alt="user photo">
+							<p>{{ user.username }}</p>
+						</td>
+						<td>{{ user.profile.wins }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
 {% endblock %}

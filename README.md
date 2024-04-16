@@ -1,17 +1,9 @@
-# Hello World!
+# Transcendance [in progress]
+### Web app of the arcade game pong
+Transcendance is a web application of the arcade game pong with a modern touch.
 
-This is our readme.md about ft_transcendence!
-
-Django version 4.2.7
-
-[TEAM]
-- By using volumes you can launch the project and work on it in the same time.
-
-[USEFULL COMMANDS]
-	- python3 manage.py createsuperuser
-
-[.env]
-	POSTGRES_DB=example
-	POSTGRES_USER=example
-	POSTGRES_PASSWORD=example
-	POSTGRES_EMAIL=example
+#### Features
+- Play the game
+- Create and manage user account
+- Send friend requests
+- Chat

@@ -319,18 +319,19 @@ header {
 
 .sidebar {
     background-color: var(--secondary-bg-color);
-    padding: 15px 8px;
-    margin-left: 10px;
     min-width: 240px;
-    border-radius: 10px;
 }
+
+@media (min-width: 768px) {
+    .sidebar {
+        margin-left: 15px;
+    }
+}
+
 
 .feed {
     min-height: 50vh;
     background-color: var(--secondary-bg-color);
-    padding: 20px;
-    border-radius: 10px;
-    margin-right: 10px;
 }
 
 /*******************************************************************************
@@ -456,8 +457,6 @@ header {
 .header {
     padding: 16px;
     background-color: var(--secondary-bg-color);
-    border-radius: 10px;
-    margin-bottom: 20px;
 }
 
 .header_img {
@@ -482,6 +481,11 @@ header {
 
 .btn_requests {
     margin-left: 10px;
+}
+@media (max-width: 768px) {
+    .btn_requests {
+        margin: 0 6px 10px 0;
+    }
 }
 
 /* ///////////////// */
