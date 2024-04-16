@@ -237,6 +237,9 @@ def profile(request, username: str) -> HttpResponse:
         b_body = render_block_to_string('accounts/profile.html', 'body', context)
         b_script = render_block_to_string('accounts/profile.html', 'script_body', context)
         return HttpResponse(b_body + b_script)
+    
+    context['request'] = request
+    context['my_csrf'] = get_token(request)
 
     return render(request, 'accounts/profile.html', context)
 
