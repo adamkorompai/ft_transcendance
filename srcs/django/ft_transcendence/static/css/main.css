@@ -187,12 +187,8 @@ header {
     padding: 10px 10%;
 }
 
-.navbar {
+.navbar_mine {
     background-color: var(--secondary-bg-color);
-    position: relative;
-}
-.navbar div:nth-child(2) .cta {
-    margin-right: 10px;
 }
 
 .logo {
@@ -320,12 +316,6 @@ header {
 .sidebar {
     background-color: var(--secondary-bg-color);
     min-width: 240px;
-}
-
-@media (min-width: 768px) {
-    .sidebar {
-        margin-left: 15px;
-    }
 }
 
 
@@ -511,6 +501,12 @@ header {
     grid-template-columns: 50% 50%;
     grid-gap: 1px;
 }
+@media (max-width: 768px) {
+    .users_list {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+}
+
 .user_card {
     display: flex;
     flex-direction: column;
