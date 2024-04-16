@@ -200,7 +200,7 @@ function onFriendRemoved() {
     csrf = status_bar.getAttribute("data-csrf")
     
     var add_friend_btn = createAddFriendBtn(id, csrf)
-    var block_btn = document.createBlockUnblockBtn(id, "block");
+    var block_btn = createBlockUnblockBtn(id, "block");
 
     status_bar.append(add_friend_btn, block_btn);
 }
