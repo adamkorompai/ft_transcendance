@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'channels_postgres',
     'chatapp',
     'accounts',
+    'pong',
 ]
 
 ASGI_APPLICATION = 'ft_transcendence.asgi.application'
@@ -161,7 +162,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static'
+    BASE_DIR / 'static',
 ]
 
 MEDIA_URL = '/media/'
