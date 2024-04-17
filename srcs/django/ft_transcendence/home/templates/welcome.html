@@ -25,7 +25,7 @@
 					<tr>
 						<td>{{ forloop.counter }}</td>
 						<td>
-							<a href="{% url 'accounts:profile'%}{{user.username}}">
+							<a class="d-flex align-items-center" href="{% url 'accounts:profile'%}{{user.username}}">
 								<img src="{{ user.profile.image.url }}" alt="user photo">
 								<p>{{ user.username }}</p>
 							</a>

@@ -38,6 +38,8 @@ sign-up: create your account
 """
 @require_http_methods(['GET', 'POST'])
 def signup_v(request) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect('home:welcome')
     context = {
         'authorize_uri': authorize_uri+FROMSIGNUP,
         'show_alerts': True,
@@ -57,11 +59,13 @@ def signup_v(request) -> HttpResponse:
 
     return render(request, 'accounts/signup.html', context)
 
-""""
+"""
 login: to your account
 """
 @require_http_methods(['GET', 'POST'])
 def login_v(request) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect('home:welcome')
     context = {
         'authorize_uri': authorize_uri+FROMLOGIN,
         'show_alerts': True,
@@ -73,12 +77,8 @@ def login_v(request) -> HttpResponse:
             user = form.get_user()
             user.profile.active = True
             login(request, user)
-            context['request'] = request
-            return render(request, 'welcome.html', context)
-            if 'next' in request.POST:
-                return redirect(request.POST.get('next'))
-            else:
-                return redirect('home:welcome')
+            context['all_users'] = User.objects.all()
+            return render(request, 'welcome.html', context) # target=app-body
     else: # GET request
         form = AuthenticationForm()
     context['form'] = form
