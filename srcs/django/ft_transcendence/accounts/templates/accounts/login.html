@@ -6,12 +6,8 @@
     FT_TRANSCENDENCE
 {% endblock %}
 
-{% block styles %}
-<link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
-{% endblock%}
-
 {% block body %}
-    <main class="login_box">
+    <div class="login_box mx-3 md-md-0">
         <div></div>
         <div class="form">
             <div>
@@ -33,7 +29,7 @@
                 </form>
             </div>
         </div>
-    </main>
+    </div>
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {
             // Add the CSRF token to htmx requests

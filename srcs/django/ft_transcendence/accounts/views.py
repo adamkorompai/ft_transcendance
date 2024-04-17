@@ -347,6 +347,8 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                     # found the request. Now accept it
                     friend_request.accept()
                     payload['response'] = 'Friend request accepted'
+                    payload['sender_username'] = friend_request.sender.username
+                    payload['sender_img_url'] = friend_request.sender.profile.image.url
                 else:
                     payload['response'] = 'Something went wrong'
             else:

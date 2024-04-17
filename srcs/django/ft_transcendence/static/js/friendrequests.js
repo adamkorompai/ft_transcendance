@@ -90,7 +90,7 @@ function acceptFriendRequest(friend_request_id, container) {
         timaout: 5000,
         success: function(data) {
             if (data['response'] == "Friend request accepted") {
-                onFriendRequestAccepted(container)
+                onFriendRequestAccepted(container, data)
             }
             else if (data.response != null) {
                 alert(data.response)
@@ -105,7 +105,7 @@ function acceptFriendRequest(friend_request_id, container) {
     })
 }
 
-function onFriendRequestAccepted(origin) {
+function onFriendRequestAccepted(origin, response_data) {
     container = document.getElementById(origin);
     container.innerHTML = "";
     id = container.getAttribute('data-id');
@@ -117,9 +117,53 @@ function onFriendRequestAccepted(origin) {
         var block_btn = createBlockUnblockBtn(id, "block");
         container.append(unfriend_btn, dm_btn, block_btn);
     } else {
-        // TODO: update the friend list widget
-        ;
+        // TODO: 
+        card = createFriendCard(response_data)
+        target = document.querySelector("#friends_cards")
+        target.append(card)
     }
+}
+
+function createFriendCard(data) {
+
+    div = document.createElement("div")
+    div.className = "user_card"
+
+    a = document.createElement('a')
+    a.setAttribute('hx-get', `/accounts/profile/${data['sender_username']}`)
+    a.setAttribute('hx-target', '#app-root')
+    a.setAttribute('hx-push-url', 'true')
+
+    img = document.createElement('img')
+    img.setAttribute('src', `${data['sender_img_url']}`) // this
+    img.setAttribute('width', '48px')
+    img.setAttribute('height', '48px')
+    img.setAttribute('alt', 'profile picture')
+
+    p = document.createElement('p')
+    p.innerHTML = data['sender_username']
+    
+    a.append(img)
+    div.append(a, p)
+
+    return div
+
+    /*
+    <div class="user_card">
+        <a 
+            hx-get="/accounts/profile/{{ f.username }}"
+            hx-target="#app-root"
+            hx-push-url="true">
+            <img
+                src="{{ f.profile.image.url }}"
+                width="48px"
+                height="48px"
+                alt="profile picture"
+            >
+        </a>
+        <p>{{ f.username }}</p>
+    </div>
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
