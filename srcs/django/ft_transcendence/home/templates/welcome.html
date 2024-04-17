@@ -6,34 +6,36 @@
 {% endblock %}
 
 {% block body %}
-	<h1>Home page</h1>
-	<br>
-	<section class="table_header">
-		<h3>Leaderboard</h3>
-	</section>
-	<section class="table_body">
-		<table>
-			<thead>
-				<tr>
-					<th>Rank</th>
-					<th>Player</th>
-					<th>Score</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for user in all_users %}
+	<div class="mx-3 mx-md-0">
+		<h1>Home page</h1>
+		<br>
+		<section class="table_header">
+			<h3>Leaderboard</h3>
+		</section>
+		<section class="table_body">
+			<table>
+				<thead>
 					<tr>
-						<td>{{ forloop.counter }}</td>
-						<td>
-							<a class="d-flex align-items-center" href="{% url 'accounts:profile'%}{{user.username}}">
-								<img src="{{ user.profile.image.url }}" alt="user photo">
-								<p>{{ user.username }}</p>
-							</a>
-						</td>
-						<td>{{ user.profile.wins }}</td>
+						<th>Rank</th>
+						<th>Player</th>
+						<th>Score</th>
 					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</section>
+				</thead>
+				<tbody>
+					{% for user in all_users %}
+						<tr>
+							<td>{{ forloop.counter }}</td>
+							<td>
+								<a class="d-flex align-items-center" href="{% url 'accounts:profile'%}{{user.username}}">
+									<img src="{{ user.profile.image.url }}" alt="user photo">
+									<p>{{ user.username }}</p>
+								</a>
+							</td>
+							<td>{{ user.profile.wins }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</section>
+	</div>
 {% endblock %}

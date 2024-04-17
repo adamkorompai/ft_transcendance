@@ -349,6 +349,13 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                     payload['response'] = 'Friend request accepted'
                     payload['sender_username'] = friend_request.sender.username
                     payload['sender_img_url'] = friend_request.sender.profile.image.url
+                    friend_list = FriendList.objects.get(user=request.user)
+                    friends = friend_list.friends.all()
+                    context = {
+                        'request': request,
+                        'friends': friends
+                    }
+                    payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:
                     payload['response'] = 'Something went wrong'
             else:

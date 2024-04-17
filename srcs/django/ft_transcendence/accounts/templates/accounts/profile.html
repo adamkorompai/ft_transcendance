@@ -168,7 +168,7 @@
 		</section>
 		
 		{% if request.user.is_authenticated and is_self == True %}
-		<aside class="sidebar p-3 mt-3 mt-md-0 rounded-2 ms-0 ms-md-2">
+		<aside id="profile_widget" class="sidebar p-3 mt-3 mt-md-0 rounded-2 ms-0 ms-md-2">
 
 			<!--/////////////////////////////////////////////-->
 			<!--                 FRIEND LIST                 -->
@@ -197,7 +197,7 @@
 			<!--               FRIEND REQUEST                -->
 			<!--/////////////////////////////////////////////-->
 			<h5 class="mt-2">Friend Requests</h5>
-			<div 
+			<div
 				data-id="{{id}}"
 				{%if csrf_token %} data-csrf="{{ csrf_token.value }}" {%else%} data-csrf="{{ my_csrf }}" {%endif%}
 				id="widget_status_bar"
