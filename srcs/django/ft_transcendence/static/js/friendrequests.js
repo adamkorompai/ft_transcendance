@@ -90,7 +90,7 @@ function acceptFriendRequest(friend_request_id, container) {
         timaout: 5000,
         success: function(data) {
             if (data['response'] == "Friend request accepted") {
-                onFriendRequestAccepted(container)
+                onFriendRequestAccepted(container, data)
             }
             else if (data.response != null) {
                 alert(data.response)
@@ -105,7 +105,7 @@ function acceptFriendRequest(friend_request_id, container) {
     })
 }
 
-function onFriendRequestAccepted(origin) {
+function onFriendRequestAccepted(origin, data) {
     container = document.getElementById(origin);
     container.innerHTML = "";
     id = container.getAttribute('data-id');
@@ -116,9 +116,10 @@ function onFriendRequestAccepted(origin) {
         var dm_btn = createMessageBtn();
         var block_btn = createBlockUnblockBtn(id, "block");
         container.append(unfriend_btn, dm_btn, block_btn);
-    } else {
-        // TODO: update the friend list widget
-        ;
+    } else { // widget_status_bar
+        content = data['content']
+        widget = document.querySelector("#profile_widget")
+        widget.innerHTML = content
     }
 }
 
@@ -200,7 +201,7 @@ function onFriendRemoved() {
     csrf = status_bar.getAttribute("data-csrf")
     
     var add_friend_btn = createAddFriendBtn(id, csrf)
-    var block_btn = document.createBlockUnblockBtn(id, "block");
+    var block_btn = createBlockUnblockBtn(id, "block");
 
     status_bar.append(add_friend_btn, block_btn);
 }

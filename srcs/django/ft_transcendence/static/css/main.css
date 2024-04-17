@@ -187,12 +187,8 @@ header {
     padding: 10px 10%;
 }
 
-.navbar {
+.navbar_mine {
     background-color: var(--secondary-bg-color);
-    position: relative;
-}
-.navbar div:nth-child(2) .cta {
-    margin-right: 10px;
 }
 
 .logo {
@@ -319,18 +315,13 @@ header {
 
 .sidebar {
     background-color: var(--secondary-bg-color);
-    padding: 15px 8px;
-    margin-left: 10px;
     min-width: 240px;
-    border-radius: 10px;
 }
+
 
 .feed {
     min-height: 50vh;
     background-color: var(--secondary-bg-color);
-    padding: 20px;
-    border-radius: 10px;
-    margin-right: 10px;
 }
 
 /*******************************************************************************
@@ -346,6 +337,16 @@ header {
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--accent2);
+}
+
+@media (max-width: 680px) {
+    .login_box {
+        grid-template-columns: 100%;
+    }
+    .login_box > div:first-child {
+        width: 100%;
+        height: 200px;
+    }
 }
 
 .login_box ul {
@@ -368,6 +369,7 @@ header {
 }
 
 .login_box > div:first-child {
+    width: 100%;
     background-image: url('../../../static/images/spacepong.png');
     background-position: center;
     background-repeat: no-repeat;
@@ -456,8 +458,6 @@ header {
 .header {
     padding: 16px;
     background-color: var(--secondary-bg-color);
-    border-radius: 10px;
-    margin-bottom: 20px;
 }
 
 .header_img {
@@ -483,6 +483,11 @@ header {
 .btn_requests {
     margin-left: 10px;
 }
+@media (max-width: 768px) {
+    .btn_requests {
+        margin: 0 6px 10px 0;
+    }
+}
 
 /* ///////////////// */
 
@@ -507,6 +512,12 @@ header {
     grid-template-columns: 50% 50%;
     grid-gap: 1px;
 }
+@media (max-width: 768px) {
+    .users_list {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+}
+
 .user_card {
     display: flex;
     flex-direction: column;

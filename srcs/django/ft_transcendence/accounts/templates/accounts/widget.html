@@ -1,0 +1,108 @@
+{% load static %}
+
+{% block content %}
+
+<h5>Friends ({{ friends | length }})</h5>
+<div class="users_list" id="friends_cards">
+    {% for f in friends %}
+    <div class="user_card">
+        <a 
+            hx-get="/accounts/profile/{{ f.username }}"
+            hx-target="#app-root"
+            hx-push-url="true">
+            <img
+                src="{{ f.profile.image.url }}"
+                width="48px"
+                height="48px"
+                alt="profile picture"
+            >
+        </a>
+        <p>{{ f.username }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<h5 class="mt-2">Friend Requests</h5>
+<div
+    data-id="{{id}}"
+    {%if csrf_token %} data-csrf="{{ csrf_token.value }}" {%else%} data-csrf="{{ my_csrf }}" {%endif%}
+    id="widget_status_bar"
+>
+{% if request.user.is_authenticated and is_self == True%}
+    {% for request in friend_requests %}
+    <div class="request_card">
+        <a 
+            hx-get="/accounts/profile/{{ request.sender.username}}"
+            hx-target="#app-root"
+            hx-push-url="true">
+            <img src="{{ request.sender.profile.image.url }}" width="48px" height="48px" alt="profile picture">
+        </a>
+        <div>
+            <p><b>{{ request.sender | capfirst }}</b></p>
+            <div>
+                <button
+                    onclick="acceptFriendRequest(
+                        '{{request.id}}',
+                        'widget_status_bar',
+                    )"
+                    class="btn_requests">
+                    Confirm
+                </button>
+                <button 
+                    onclick='declineFriendRequest(
+                        "{{request.id}}",
+                        "widget_status_bar",
+                    )' 
+                    class="btn_discrete btn_passive">
+                    Ignore
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+</div>
+
+<h5 class="mt-2">All Users</h5>
+<div class="users_list">
+
+    {% for usr in all_users %}
+        {% if usr != request.user and usr not in friends and usr not in blocklist %}
+            <div class="user_card">
+                <a 
+                    hx-get="/accounts/profile/{{ usr.username }}"
+                    hx-target="#app-root"
+                    hx-push-url="true">
+                    <img src="{{ usr.profile.image.url }}" width="48px" height="48px" alt="profile picture">
+                </a>
+                <p>{{ usr.username }}</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+</div>
+
+<h5 class="mt-2">Blocked</h5>
+<div class="users_list mt-2">
+{% if request.user.is_authenticated and is_self == True %}
+
+    {% if blocklist|length > 0 %}
+
+        {% for blocked_user in blocklist %}
+        <div class="user_card">
+            <a 
+                hx-get="/accounts/profile/{{ blocked_user.username }}"
+                hx-target="#app-root"
+                hx-push-url="true">
+                <img src="{{ blocked_user.profile.image.url }}" width="48px" height="48px" alt="profile picture">
+            </a>
+            <p>{{ blocked_user.username }}</p>
+        </div>
+        {% endfor %}
+
+    {% endif %}
+
+{% endif %}
+</div>
+
+{% endblock %}

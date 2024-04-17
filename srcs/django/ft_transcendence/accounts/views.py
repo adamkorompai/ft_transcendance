@@ -38,6 +38,8 @@ sign-up: create your account
 """
 @require_http_methods(['GET', 'POST'])
 def signup_v(request) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect('home:welcome')
     context = {
         'authorize_uri': authorize_uri+FROMSIGNUP,
         'show_alerts': True,
@@ -57,11 +59,13 @@ def signup_v(request) -> HttpResponse:
 
     return render(request, 'accounts/signup.html', context)
 
-""""
+"""
 login: to your account
 """
 @require_http_methods(['GET', 'POST'])
 def login_v(request) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect('home:welcome')
     context = {
         'authorize_uri': authorize_uri+FROMLOGIN,
         'show_alerts': True,
@@ -73,12 +77,8 @@ def login_v(request) -> HttpResponse:
             user = form.get_user()
             user.profile.active = True
             login(request, user)
-            context['request'] = request
-            return render(request, 'welcome.html', context)
-            if 'next' in request.POST:
-                return redirect(request.POST.get('next'))
-            else:
-                return redirect('home:welcome')
+            context['all_users'] = User.objects.all()
+            return render(request, 'welcome.html', context) # target=app-body
     else: # GET request
         form = AuthenticationForm()
     context['form'] = form
@@ -237,6 +237,9 @@ def profile(request, username: str) -> HttpResponse:
         b_body = render_block_to_string('accounts/profile.html', 'body', context)
         b_script = render_block_to_string('accounts/profile.html', 'script_body', context)
         return HttpResponse(b_body + b_script)
+    
+    context['request'] = request
+    context['my_csrf'] = get_token(request)
 
     return render(request, 'accounts/profile.html', context)
 
@@ -344,6 +347,15 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                     # found the request. Now accept it
                     friend_request.accept()
                     payload['response'] = 'Friend request accepted'
+                    payload['sender_username'] = friend_request.sender.username
+                    payload['sender_img_url'] = friend_request.sender.profile.image.url
+                    friend_list = FriendList.objects.get(user=request.user)
+                    friends = friend_list.friends.all()
+                    context = {
+                        'request': request,
+                        'friends': friends
+                    }
+                    payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:
                     payload['response'] = 'Something went wrong'
             else:
