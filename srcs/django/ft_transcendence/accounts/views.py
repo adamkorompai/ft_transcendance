@@ -353,7 +353,10 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                     friends = friend_list.friends.all()
                     context = {
                         'request': request,
-                        'friends': friends
+                        'friends': friends,
+                        'all_users': User.objects.all(),
+                        'blocklist': user.profile.blocklist.all(),
+                        'is_self': True,
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:

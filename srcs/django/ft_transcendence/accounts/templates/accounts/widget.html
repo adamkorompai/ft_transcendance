@@ -6,7 +6,7 @@
 <div class="users_list" id="friends_cards">
     {% for f in friends %}
     <div class="user_card">
-        <a 
+        <a
             hx-get="/accounts/profile/{{ f.username }}"
             hx-target="#app-root"
             hx-push-url="true">
