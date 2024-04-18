@@ -98,7 +98,7 @@
 										<!--/////////////////////////////////////////////-->
 										<button
 											data-next-url="{% url 'accounts:friend_request_cancel' %}"
-											onclick="sendFriendRequest('{{ id }}', {% if csrf_token %} '{{ csrf_token.value }}' {% else %} '{{ my_csrf }}' {%endif%})"
+											onclick="sendFriendRequest('{{ id }}', {% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%})"
 											class="btn_requests"
 											id="id_send_friend_request_btn">
 											Add Friend
@@ -199,7 +199,7 @@
 			<h5 class="mt-2">Friend Requests</h5>
 			<div
 				data-id="{{id}}"
-				{%if csrf_token %} data-csrf="{{ csrf_token.value }}" {%else%} data-csrf="{{ my_csrf }}" {%endif%}
+				{%if csrf_token %} data-csrf="{{ csrf_token }}" {%else%} data-csrf="{{ my_csrf }}" {%endif%}
 				id="widget_status_bar"
 			>
 			{% if request.user.is_authenticated and is_self == True%}
