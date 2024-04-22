@@ -23,4 +23,10 @@ reset: fclean
 
 re: fclean all
 
-.PHONY: all build clean fclean re reset
+git:
+		git add .
+		git commit -m "$m"
+		git push
+		@echo "ALL is on your GIT ✔️"
+
+.PHONY: all build clean fclean re reset git
