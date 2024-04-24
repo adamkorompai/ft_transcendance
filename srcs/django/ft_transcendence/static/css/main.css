@@ -59,6 +59,13 @@
     --alert: #ED4245;
 }
 
+.__bg-secondary {
+    background-color: var(--secondary-bg-color);
+}
+.__bg-primary {
+    background-color: var(--main-bg-color);
+}
+
 body {
     font-family: 'whitney', "Segoe UI", Helvetica, Arial, sans-serif;
     line-height: 1.5;
@@ -313,16 +320,16 @@ header {
     margin: 10px 0;
 }
 
-.sidebar {
+/* .sidebar {
     background-color: var(--secondary-bg-color);
     min-width: 240px;
-}
+} */
 
 
-.feed {
+/* .feed {
     min-height: 50vh;
     background-color: var(--secondary-bg-color);
-}
+} */
 
 /*******************************************************************************
                              LOGIN PAGE
@@ -446,43 +453,28 @@ header {
     margin: 0 4px;
 }
 
-.option.edit {
+/* .option.edit {
     background-color: #216ADD;
 }
 
 .option.delete {
     border: 1px solid var(--secondary-bg-color);
     background-color: var(--alert);
-}
+} */
 
-.header {
-    padding: 16px;
-    background-color: var(--secondary-bg-color);
-}
-
-.header_img {
-    margin-right: 20px;
-    border-radius: 200px;
-}
-
-.header_info {
-}
-
-.header_score {
-}
-
-.bs_v, .bs_l {
+/* .bs_v, .bs_l {
     margin-right: 10px;
-}
+} */
 
-.header_option {
+/* .header_option {
     padding:4px 12px;
     border-radius: 8px;
-}
+} */
 
 .btn_requests {
     margin-left: 10px;
 }
+
 @media (max-width: 768px) {
     .btn_requests {
         margin: 0 6px 10px 0;
@@ -517,23 +509,23 @@ header {
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 }
-
+/* 
 .user_card {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 12px 4px;
     background-color: #2d2b34;
-}
+} */
 
-.status_online {
+.__green-circle {
     margin-left: 10px;
     height: 10px;
     width: 10px;
     border-radius: 20px;
     background-color: greenyellow;
 }
-.status_offline {
+.__red-circle {
     margin-left: 10px;
     height: 10px;
     width: 10px;

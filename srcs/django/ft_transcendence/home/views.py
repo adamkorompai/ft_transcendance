@@ -16,12 +16,3 @@ def welcome(request):
 		html = render_block_to_string('welcome.html', 'body', context)
 		return HttpResponse(html)
 	return render(request, 'welcome.html', context)
-
-def leaderboard(request):
-	context = {
-		'all_users': User.objects.all(),
-	}
-	if 'HTTP_HX_REQUEST' in request.META:
-		html = render_block_to_string('leaderboard.html', 'body', context)
-		return HttpResponse(html)
-	return render(request, 'leaderboard.html', context)
