@@ -17,7 +17,7 @@
 	</head>
 	<body hx-headers='{"X-CSRFToken": "{% csrf_token %}"}' id="app-body">
 		{% include './nav.html' %}
-		<main id="app-root" class="container_global">
+		<main id="app-root">
 			{% if show_alerts %}
 				{% if messages %}
 					{% for message in messages %}

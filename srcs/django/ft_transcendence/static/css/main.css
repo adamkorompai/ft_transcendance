@@ -66,6 +66,11 @@
     background-color: var(--main-bg-color);
 }
 
+
+/*******************************************************************************
+                             BUILT-IN TAGS
+*******************************************************************************/
+
 body {
     font-family: 'whitney', "Segoe UI", Helvetica, Arial, sans-serif;
     line-height: 1.5;
@@ -74,10 +79,6 @@ body {
     background-color: var(--main-bg-color);
     color: var(--text-color);
 }
-
-/*******************************************************************************
-                             BUILT-IN TAGS
-*******************************************************************************/
 
 li, a, button {
     font-family: "Inter", Arial, Helvetica, sans-serif;
@@ -509,14 +510,14 @@ header {
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 }
-/* 
+ 
 .user_card {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 12px 4px;
     background-color: #2d2b34;
-} */
+}
 
 .__green-circle {
     margin-left: 10px;
@@ -609,4 +610,91 @@ tbody tr:nth-child(odd) {
 
 tbody tr:hover {
     background-color: rgb(136, 0, 255);
+}
+
+/* QUICK PLAY */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    height: 50vh;
+    justify-content: space-between;
+}
+
+.box {
+    width: 40%; /* Adjust the width as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80%; /* Adjust the height as needed */
+    border: 2px solid #000;
+    box-sizing: border-box;
+    margin: 0 5%; /* Adjust the margin to add space between boxes */
+    position: relative;
+}
+
+.box:nth-child(1) {
+    background-color: #7011F4;
+}
+
+.box:nth-child(2) {
+    background-color: #7011F4;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h2 {
+    font-size: 30px; /* Adjust the font size as needed */
+    margin: 5px 0; /* Adjust the margin as needed */
+}
+
+.user-image {
+    margin-bottom: 10px; /* Ensure spacing between the image and the username */
+    border-radius: 5px; /* Optional: Adds rounded corners to the image */
+    width: 80px; /* Adjust based on your preference */
+    height: 80px; /* Adjust based on your preference */
+    object-fit: cover; /* Ensures the image covers the area, useful for non-square images */
+}
+
+.username-input {
+    width: 80%; /* Adjust the width of the input field as needed */
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.ready-box {
+    position: absolute;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    text-align: center;
+    cursor: pointer;
+}
+
+.ready-box p {
+    margin: 0;
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.ready-red {
+    background-color: #ff0000;
+}
+
+.ready-green {
+    background-color: #00ff00;
 }

@@ -117,9 +117,7 @@ function onFriendRequestAccepted(origin, data) {
         var block_btn = createBlockUnblockBtn(id, "block");
         container.append(unfriend_btn, dm_btn, block_btn);
     } else { // widget_status_bar
-        content = data['content']
-        widget = document.querySelector("#profile_widget")
-        widget.innerHTML = content
+        container.innerHTML = data['content']
     }
 }
 
