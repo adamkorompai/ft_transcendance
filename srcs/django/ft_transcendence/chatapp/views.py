@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Room, Message
 from accounts.models import FriendList
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 from accounts.models import Profile
+from render_block import render_block_to_string
 
 # Create your views here.
 @login_required
@@ -20,12 +21,18 @@ def chat_page(request):
         except FriendList.DoesNotExist:
             friends = None
 
-    return render(request, "chat.html", {
+    context = {
         "rooms": rooms,
         "users" : users,
         "profiles": profile,
         "friends" : friends,
-        })
+        "request": request,
+    }
+    if 'HTTP_HX_REQUEST' in request.META:
+        context = {"request": request}
+        html = render_block_to_string('chat.html', 'body', context)
+        return HttpResponse(html)
+    return render(request, "chat.html", context)
 
 def room(request, slug):
     room_name=Room.objects.get(slug=slug).name
