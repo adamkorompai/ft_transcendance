@@ -65,6 +65,9 @@
 .__bg-primary {
     background-color: var(--main-bg-color);
 }
+.__bg-accent {
+    background-color: var(--accent);
+}
 
 
 /*******************************************************************************
@@ -147,6 +150,10 @@ input, textarea {
 input:focus, textarea:focus {
     border: 1px solid var(--accent);
     box-shadow: 0 0 4px rgba(255, 0, 0, .5);
+}
+
+table {
+    width: 100%;
 }
 
 .icon {
@@ -548,15 +555,6 @@ header {
     overflow: hidden;
 }
 
-table {
-    width: 100%;
-}
-
-.table_header {
-    text-align: center;
-    background-color: var(--accent);
-
-}
 .table_header h1 {
     font-size: 32px;
     padding: 8px 0;
@@ -565,7 +563,7 @@ table {
 .table_body {
     display: flex;
     justify-content: space-between;
-    width: 95%;
+    /* width: 100%; */
     height: calc(89% - 1.6rem);
     margin: .8rem auto;
     border: 1px solid var(--bg-layer2);
@@ -612,7 +610,9 @@ tbody tr:hover {
     background-color: rgb(136, 0, 255);
 }
 
-/* QUICK PLAY */
+/*******************************************************************************
+                             QUICK PLAY
+*******************************************************************************/
 
 body {
     margin: 0;
