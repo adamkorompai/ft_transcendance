@@ -8,7 +8,7 @@
 
 {% block body %}
 	<div>
-		<h1 style="margin-bottom: 30px;">Edit Page</h1>
+		<h1 class="mb-3">Edit Page</h1>
 		<form hx-post="{% url 'accounts:profile_edit' %}" hx-encoding="multipart/form-data" hx-target="#app-body">
 			{% csrf_token %}
 			{{ u_form | crispy }}

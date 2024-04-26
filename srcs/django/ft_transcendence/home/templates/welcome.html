@@ -7,8 +7,11 @@
 
 {% block body %}
 	<div class="mx-3 mx-md-0">
-		<h1>Home page</h1>
+		<h1>Welcome {{request.user.username}}</h1>
 		<br>
+		<!-- *************************************************************** -->
+		<!--                          LEADERBOARD                            -->
+		<!-- *************************************************************** -->
 		<section class="table_header">
 			<h3>Leaderboard</h3>
 		</section>

@@ -7,20 +7,20 @@
 
 {% block body %}
 <div class="mx-3 mx-md-0">
-	<div class="header d-flex mb-3 rounded-2">
-		<img class="header_img" src="{{ profile_img }}" width="125px" height="125px" alt="profile picture">
-		<div class="header_info">
+	<div class="p-3 __bg-secondary d-flex mb-3 rounded-2">
+		<img class="rounded-circle me-3" src="{{ profile_img }}" width="125px" height="125px" alt="profile picture">
+		<div>
 			<div class="d-flex flex-column flex-md-row align-items-md-center">
 				<div class="d-flex align-items-center">
 					<h1 class="">@{{ username }}</h1>
 					{% if username == request.user.username %}
-						<a class="header_option edit" hx-get="{% url 'accounts:profile_edit' %}" hx-target="#app-root" hx-swap="innerHtml">
+						<a class="py-1 px-2 edit" hx-get="{% url 'accounts:profile_edit' %}" hx-target="#app-root" hx-swap="innerHtml">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
 								<path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
 								</svg>
 						</a>
 					{% endif %}
-					<div {% if active == True %} class="status_online" {%else%} class="status_offline" {%endif%}></div>
+					<div {% if active == True %} class="__green-circle" {%else%} class="__red-circle" {%endif%}></div>
 				</div>
 
 				<!-- /////////////////////////////////////////////////////// -->
@@ -154,21 +154,28 @@
 
 			</div>
 			<p>{{description}}</p>
-			<div class="d-flex header_score">
-				<p class="mr-5 bs_v">wins: {{ wins }}</p>
-				<p class="bs_l">losses: {{ losses }}</p>
+			<div class="d-flex">
+				<p class="me-2">wins: {{ wins }}</p>
+				<p>losses: {{ losses }}</p>
 			</div>
 		</div>
 	</div>
 	<div class="d-flex flex-column flex-md-row">
 
-		<section class="feed p-3 rounded-2">
+		<section class="min-vh-100 __bg-secondary p-3 rounded-2">
 			<h3>Latest Matches</h3>
 			<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque quidem voluptatum quisquam officiis numquam, perferendis tempore rem nostrum ut libero asperiores optio voluptate quaerat? Minima.</p>
 		</section>
 		
 		{% if request.user.is_authenticated and is_self == True %}
-		<aside id="profile_widget" class="sidebar p-3 mt-3 mt-md-0 rounded-2 ms-0 ms-md-2">
+		<aside
+			id="profile_widget"
+			class="__bg-secondary p-3 mt-3 mt-md-0 rounded-2 ms-0 ms-md-2"
+			style="
+				min-width: 240px;
+			"
+			hx-boost="true"
+			>
 
 			<!--/////////////////////////////////////////////-->
 			<!--                 FRIEND LIST                 -->
@@ -176,9 +183,11 @@
 			<h5>Friends ({{ friends | length }})</h5>
 			<div class="users_list" id="friends_cards">
 				{% for f in friends %}
-				<div class="user_card">
+				<div
+					class="d-flex flex-column align-items-center p-3"
+					style="background-color: #2d2b34;">
 					<a 
-						hx-get="/accounts/profile/{{ f.username }}"
+						href="/accounts/profile/{{ f.username }}"
 						hx-target="#app-root"
 						hx-push-url="true">
 						<img
@@ -217,7 +226,7 @@
 							<button
 								onclick="acceptFriendRequest(
 									'{{request.id}}',
-									'widget_status_bar',
+									'profile_widget',
 								)"
 								class="btn_requests">
 								Confirm
@@ -225,7 +234,7 @@
 							<button 
 								onclick='declineFriendRequest(
 									"{{request.id}}",
-									"widget_status_bar",
+									"profile_widget",
 								)' 
 								class="btn_discrete btn_passive">
 								Ignore
@@ -245,7 +254,9 @@
 
 				{% for usr in all_users %}
 					{% if usr != request.user and usr not in friends and usr not in blocklist %}
-						<div class="user_card">
+						<div
+							class="d-flex flex-column align-items-center p-3"
+							style="background-color: #2d2b34;">
 							<a 
 								hx-get="/accounts/profile/{{ usr.username }}"
 								hx-target="#app-root"
@@ -269,7 +280,9 @@
 				{% if blocklist|length > 0 %}
 
 					{% for blocked_user in blocklist %}
-					<div class="user_card">
+					<div
+						class="d-flex flex-column align-items-center p-3"
+						style="background-color: #2d2b34;">
 						<a 
 							hx-get="/accounts/profile/{{ blocked_user.username }}"
 							hx-target="#app-root"
