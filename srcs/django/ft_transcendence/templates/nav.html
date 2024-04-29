@@ -44,6 +44,9 @@
                     <a  class="nav-link nav_links text-light" href="/chatapp/" hx-target="#app-root">Chat</a>
                 </li>
                 <li class="nav-item active">
+                    <a  class="nav-link nav_links text-light" href="{% url 'user_stats' %}" hx-target="#app-root">Stats</a>
+                </li>
+                <li class="nav-item active">
                     <a  class="nav-link nav_links text-light" href="{% url 'accounts:profile' %}{{ request.user.username }}" hx-target="#app-root">Profile</a>
                 </li>
             </ul>

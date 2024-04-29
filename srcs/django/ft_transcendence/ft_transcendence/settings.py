@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'chatapp',
     'accounts',
     'pong',
+    'stats',
 ]
 
 ASGI_APPLICATION = 'ft_transcendence.asgi.application'

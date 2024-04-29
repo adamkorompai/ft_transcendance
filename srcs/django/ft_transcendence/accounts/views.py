@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from render_block import render_block_to_string
 from django.middleware.csrf import get_token
+from stats.models import UserStats
 
 # get acces to environment variables
 load_dotenv()
@@ -137,6 +138,7 @@ def callback(request) -> None:
         newUser = User.objects.create_user(username_42, email_42)
         newUser.profile.isstudent = True
         newUser.profile.save()
+        UserStats.objects.create(user=newUser)  # Créer une instance UserStats pour le nouvel utilisateur
         messages.success(request, f'Your account has been created! You are now able to log in.')
         return redirect('accounts:login')
 
