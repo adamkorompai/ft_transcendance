@@ -2,12 +2,12 @@
 .env
 *.DS_Store
 
-*/migrations/*
+*migrations/
 !*/migrations/__init__.py
 
 table.txt
-srcs/data
-tmp
+/srcs/data/
+/tmp
 
 # Django specific
 __pycache__/
