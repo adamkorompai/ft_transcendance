@@ -2,6 +2,9 @@
 # python3 -m venv tmp
 # source tmp/bin/activate
 # pip install -r requirements.txt
+# 
+# source tmp/bin/activate //pour activer l'env temp
+# git push -u origin stats //pour push sur la branche stats
 
 aiopg==1.4.0
 asgiref==3.7.2

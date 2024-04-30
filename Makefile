@@ -17,9 +17,9 @@ fclean: clean
 	-docker rmi srcs_django
 
 reset: fclean
-	rm -rf ./srcs/data
-	find . -type d -name '__pycache__' -exec rm -r {} +
-	rm -rf ./srcs/django/ft_transcendence/threejs
+	sudo rm -rf ./srcs/data
+	sudo find . -type d -name '__pycache__' -exec rm -r {} +
+	sudo rm -rf ./srcs/django/ft_transcendence/threejs
 
 re: fclean all
 

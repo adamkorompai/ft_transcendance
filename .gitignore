@@ -6,7 +6,8 @@
 !*/migrations/__init__.py
 
 table.txt
-./srcs/data
+srcs/data
+tmp
 
 # Django specific
 __pycache__/

@@ -173,8 +173,8 @@ def profile(request, username: str) -> HttpResponse:
         context['id'] = displayed_user.id
         context['email'] = displayed_user.email
         context['profile_img'] = displayed_user.profile.image.url
-        context['wins'] = displayed_user.profile.wins
-        context['losses'] = displayed_user.profile.losses
+        # context['wins'] = displayed_user.profile.wins
+        # context['losses'] = displayed_user.profile.losses
         context['active'] = displayed_user.profile.active
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
