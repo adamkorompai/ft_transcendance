@@ -132,7 +132,7 @@ function declineFriendRequest(friend_request_id, origin) {
         timaout: 5000,
         success: function(data) {
             if (data['response'] == "Friend request declined") {
-                onFriendRequestDeclined(origin);
+                onFriendRequestDeclined(origin, data['content']);
             }
             else if (data.response != null) {
                 alert(data.response)
@@ -147,18 +147,18 @@ function declineFriendRequest(friend_request_id, origin) {
     })
 }
 
-function onFriendRequestDeclined(origin) {
-    var status_bar = document.getElementById(origin);
-    status_bar.innerHTML = ""
-    id = status_bar.getAttribute("data-id");
-    csrf = status_bar.getAttribute("data-csrf");
+function onFriendRequestDeclined(origin, response_content) {
+    var container = document.getElementById(origin);
+    container.innerHTML = ""
+    id = container.getAttribute("data-id");
+    csrf = container.getAttribute("data-csrf");
 
     if (origin === "header_status_bar") {
         var addFriendBtn = createAddFriendBtn(id, csrf);
         var blockBtn = createBlockUnblockBtn(id, "block");
-        status_bar.append(addFriendBtn, blockBtn);
+        container.append(addFriendBtn, blockBtn);
     } else {
-        ;
+        container.innerHTML = response_content
     }
 }
 

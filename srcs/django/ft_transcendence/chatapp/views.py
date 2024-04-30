@@ -29,7 +29,6 @@ def chat_page(request):
         "request": request,
     }
     if 'HTTP_HX_REQUEST' in request.META:
-        context = {"request": request}
         html = render_block_to_string('chat.html', 'body', context)
         return HttpResponse(html)
     return render(request, "chat.html", context)

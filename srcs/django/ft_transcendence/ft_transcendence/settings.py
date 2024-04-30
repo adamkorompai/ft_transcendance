@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'chatapp',
     'accounts',
     'pong',
+    'django_extensions',
+    'sslserver',
 ]
 
 ASGI_APPLICATION = 'ft_transcendence.asgi.application'
@@ -175,3 +177,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

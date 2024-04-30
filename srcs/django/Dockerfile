@@ -19,8 +19,14 @@ RUN pip install --no-cache-dir psycopg2-binary \
 				crispy-bootstrap5 \
 				# for ImageField in models
 				Pillow \
+				# render specific block in template
 				Jinja2 \
-				django-render-block
+				django-render-block \
+				# enable ssl certificate
+				werkzeug \
+				django-extensions \
+				pyOpenSSL \
+				django-sslserver
 
 COPY ./ft_transcendence /home/django/ft_transcendence
 
