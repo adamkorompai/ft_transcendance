@@ -140,22 +140,36 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             leftPaddle.score++;
-            setTimeout(function() {
-                resetBall();
-                goalScored = false; // Reset goal scored flag after 2 seconds
-            }, goalTime);
+            if (leftPaddle.score >= 7) {
+                endGame('Player 1');
+            } else {
+                setTimeout(function() {
+                    resetBall();
+                    goalScored = false; // Reset goal scored flag after 2 seconds
+                }, goalTime);
+            }
         }
     } else if (ball.x - ball.radius < 0) {
         // Player 2 (right) scores
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             rightPaddle.score++;
-            setTimeout(function() {
-                resetBall();
-                goalScored = false; // Reset goal scored flag after 2 seconds
-            }, goalTime);
+            if (rightPaddle.score >= 7) {
+                endGame('Player 2');
+            } else {
+                setTimeout(function() {
+                    resetBall();
+                    goalScored = false; // Reset goal scored flag after 2 seconds
+                }, goalTime);
+            }
         }
     }
+}
+
+// Function to end the game
+function endGame(winner) {
+    clearInterval(gameLoop);
+    alert(`Game Over! ${winner} wins!`);
 }
 
 function resetBall() {

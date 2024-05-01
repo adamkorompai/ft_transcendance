@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 
 class UserStats(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -10,6 +11,7 @@ class UserStats(models.Model):
     goals_conceded = models.IntegerField(default=0)
     time_played = models.IntegerField(default=0)
     nb_defense = models.IntegerField(default=0)
+    match_history = ArrayField(models.JSONField(), default=list)
 
     def __str__(self):
         return f"{self.user.username}'s Stats"
