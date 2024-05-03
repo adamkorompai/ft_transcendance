@@ -9,4 +9,40 @@
 {% endblock %}
 
 {% block body %}
+<form method="post" id="tournament_form" action="{% url 'create_tournament' %}">
+    {% csrf_token %}
+    <label for="id_nb_players">Number of Players:</label>
+    <select name="nb_players" id="id_nb_players" required>
+        <option value="4">4</option>
+        <option value="8">8</option>
+        <option value="16">16</option>
+    </select><br><br>
+
+    <label for="id_players">Select Players:</label>
+    <select name="players" id="id_players" multiple required>
+        {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Create Tournament</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var form = document.getElementById("tournament_form");
+        var nbPlayersSelect = document.getElementById("id_nb_players");
+        var playersSelect = document.getElementById("id_players");
+
+        form.addEventListener("submit", function(event) {
+            var nbPlayers = parseInt(nbPlayersSelect.value);
+            var selectedPlayers = playersSelect.selectedOptions.length;
+            
+            if (selectedPlayers !== nbPlayers) {
+                alert("Please select exactly " + nbPlayers + " players.");
+                event.preventDefault();
+            }
+        });
+    });
+</script>
 {% endblock %}
