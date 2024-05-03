@@ -7,6 +7,8 @@ import random, math
 from django.urls import reverse
 from math import ceil, log2
 from django.db.models import Max
+from django.templatetags.static import static
+from django.http import JsonResponse
 
 # Create your views here.
 def pong_game(request):
@@ -156,3 +158,12 @@ def end_tournament(request, tournament_id):
     tournament.save()
     Announcement.objects.all().delete()
     return redirect('play')
+
+def check_user(request, username):
+    try:
+        user = User.objects.get(username=username)
+        profile_image = user.profile.image.url
+        return JsonResponse({'exists': True, 'profile_image': profile_image})
+    except User.DoesNotExist:
+        default_image = static('../media/default.png')
+        return JsonResponse({'exists': False, 'profile_image': default_image})
