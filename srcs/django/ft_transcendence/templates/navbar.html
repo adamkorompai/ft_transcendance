@@ -18,6 +18,8 @@
                         <li><a href="{% url 'home:welcome' %}" hx-target="#app-root">Home</a></li>
                         <li><a href="/play/" hx-target="#app-root">Play</a></li>
                         <li><a href="/chatapp/" hx-target="#app-root">Chat</a></li>
+                        <li><a href="/stats/" hx-target="#app-root">Stats</a></li>
+                        <!-- <li></li><a href="{% url 'user_stats' %}">stats</a></li> -->
                         <li><a href="{% url 'accounts:profile' %}{{request.user.username}}" hx-target="#app-root">Profile</a></li>
                     {% endif %}
                 </ul>

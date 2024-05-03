@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Statistics{% endblock %}
+
+{% block body %}
+<head>
+    <style>
+        .table th,
+        .table td {
+            border: none;
+        }
+        .table tbody tr {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Top 3 Wins</h3>
+            <table class="table bg-white">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Wins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in top_by_wins|slice:":3" %}
+                    <tr class="bg-white">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.user.username }}</td>
+                        <td>{{ user.wins }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <h3>Top 3 Total Games</h3>
+            <table class="table bg-white">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Total Games</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in top_by_total_games|slice:":3" %}
+                    <tr class="bg-white">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.user.username }}</td>
+                        <td>{{ user.total_games }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <h3>Top 3 % of Wins</h3>
+            <table class="table bg-white">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Wins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in top_by_win_ratio|slice:":3" %}
+                    <tr class="bg-white">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.user.username }}</td>
+                        <td>{{ user.win_ratio }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<!-- c'est passable a voir/ c'est revu lol -->
+    <div class="text-center">
+        <h2>Your Stats</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Graphiques ratio -->
+            <h3>Win/Loss</h3>
+            <div class="progress">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ stats.win_ratio }}%;" aria-valuenow="{{ stats.win_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.wins }}</div>
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ stats.loss_ratio }}%;" aria-valuenow="{{ stats.loss_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.losses }}</div>
+            </div>
+
+            <h3>Goals Scored/Conceded</h3>
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.goals_scored_ratio }}%;" aria-valuenow="{{ stats.goals_scored_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.goals_scored }}</div>
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ stats.goals_conceded_ratio }}%;" aria-valuenow="{{ stats.goals_conceded_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.goals_conceded }}</div>
+            </div>
+
+            <h3>Defense/Goals Conceded</h3>
+            <div class="progress">
+                <div class="progress-bar bg-info" role="progressbar" style="width: {{ stats.defense_ratio }}%;" aria-valuenow="{{ stats.defense_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.nb_defense }}</div>
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ stats.conceded_ratio }}%;" aria-valuenow="{{ stats.conceded_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.goals_conceded }}</div>
+            </div>
+
+            <h3>Defense/Goals Scored</h3>
+            <div class="progress">
+                <div class="progress-bar bg-info" role="progressbar" style="width: {{ stats.defense_scored_ratio }}%;" aria-valuenow="{{ stats.defense_scored_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.nb_defense }}</div>
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.scored_ratio }}%;" aria-valuenow="{{ stats.scored_ratio }}" aria-valuemin="0" aria-valuemax="100">{{ stats.goals_scored }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Stats détaillées -->
+            <ul>
+                <h4></h4>
+                <li>Total Games Played: {{ stats.total_games }}</li>
+                <li>Total Wins: {{ stats.wins }}</li>
+                <li>Total Goals Scored: {{ stats.goals_scored }}</li>
+                <li>Total Goals Conceded: {{ stats.goals_conceded }}</li>
+                <li>Time Played: {{ stats.time_played }} Minutes</li>
+                <li>Number of Defense: {{ stats.nb_defense }}</li>
+                <li>Goals Scored per Game: {{ stats.goals_scored_ratio }}</li>
+                <li>Goals Conceded per Game: {{ stats.goals_conceded_ratio }}</li>
+                <li>Number of Defense per Game: {{ stats.nb_defense_ratio }}</li>
+                <li>Time Played per Game: {{ stats.time_played_ratio }} Minutes</li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

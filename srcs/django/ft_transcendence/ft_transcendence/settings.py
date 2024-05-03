@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'chatapp',
     'accounts',
     'pong',
+    'stats',
     'django_extensions',
     'sslserver',
 ]

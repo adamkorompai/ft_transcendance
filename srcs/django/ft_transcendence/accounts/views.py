@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from render_block import render_block_to_string
 from django.middleware.csrf import get_token
+from stats.models import UserStats
 
 # get acces to environment variables
 load_dotenv()
@@ -137,6 +138,7 @@ def callback(request) -> None:
         newUser = User.objects.create_user(username_42, email_42)
         newUser.profile.isstudent = True
         newUser.profile.save()
+        UserStats.objects.create(user=newUser)  # Créer une instance UserStats pour le nouvel utilisateur
         messages.success(request, f'Your account has been created! You are now able to log in.')
         return redirect('accounts:login')
 
@@ -171,12 +173,17 @@ def profile(request, username: str) -> HttpResponse:
         context['id'] = displayed_user.id
         context['email'] = displayed_user.email
         context['profile_img'] = displayed_user.profile.image.url
-        context['wins'] = displayed_user.profile.wins
-        context['losses'] = displayed_user.profile.losses
         context['active'] = displayed_user.profile.active
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
         context['blocklist'] = displayed_user.profile.blocklist.all()
+
+        try:
+            user_stats = UserStats.objects.get(user=displayed_user)
+        except UserStats.DoesNotExist:
+            user_stats = None
+
+        context['user_stats'] = user_stats
 
         try:
             friend_list = FriendList.objects.get(user=displayed_user)

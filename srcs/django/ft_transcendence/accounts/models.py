@@ -5,17 +5,19 @@ from PIL import Image
 from django.conf import settings
 from django.utils import timezone
 from .helpers import pick_random_description
+from stats.models import UserStats
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.png', upload_to='profile_pics')
     isstudent = models.BooleanField(default=False)
-    wins = models.IntegerField(default=0)
-    losses = models.IntegerField(default=0)
+    # wins = models.IntegerField(default=0)
+    # losses = models.IntegerField(default=0)
     creation_date = models.DateTimeField(default=timezone.now)
     active = models.BooleanField(default=False)
     description = models.CharField(default=pick_random_description())
     blocklist = models.ManyToManyField(User, blank=True, related_name="blocklist")
+    userstats = models.OneToOneField(UserStats, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'

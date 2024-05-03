@@ -24,6 +24,7 @@ urlpatterns = [
     path('chatapp/', include('chatapp.urls')),
     path('play/', include('pong.urls')),
     path('', include('home.urls')),
+    path('stats/', include('stats.urls')),
     path('accounts/', include('accounts.urls')),
 ]
 

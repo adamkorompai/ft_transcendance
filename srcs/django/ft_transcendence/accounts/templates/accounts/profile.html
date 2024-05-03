@@ -155,16 +155,36 @@
 			</div>
 			<p>{{description}}</p>
 			<div class="d-flex">
-				<p class="me-2">wins: {{ wins }}</p>
-				<p>losses: {{ losses }}</p>
+				<p class="me-2">wins: {{ user_stats.wins }}</p>
+				<p>losses: {{ user_stats.losses }}</p>
 			</div>
 		</div>
 	</div>
+	<!-- partie historique match -->
 	<div class="d-flex flex-column flex-md-row">
-
-		<section class="min-vh-100 __bg-secondary p-3 rounded-2">
-			<h3>Latest Matches</h3>
-			<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque quidem voluptatum quisquam officiis numquam, perferendis tempore rem nostrum ut libero asperiores optio voluptate quaerat? Minima.</p>
+		<section class="w-auto __bg-secondary p-3 rounded-2" style="min-width: 508px;">
+			<h3>Match History</h3>
+			{% if user_stats %}
+				<div style="display: grid; grid-template-columns: auto 40px 130px 40px auto; gap: 10px;">
+					{% for match in user_stats.match_history %}
+						<div style="text-align: right;">Me</div>
+						<div style="width: 30px; height: 30px;">
+							<img src="{{ request.user.profile.image.url }}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.user_score > match.opponent_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}">
+						</div>
+						<div style="font-family: Courier; font-size: 20px; text-align: center;">[{{ match.user_score }}] - [{{ match.opponent_score }}]</div>
+						<div style="width: 30px; height: 30px;">
+							{% for usr in all_users %}
+								{% if usr.username == match.opponent %}
+									<img src="{{ usr.profile.image.url }}" alt="Opponent Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.opponent_score > match.user_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}; margin-left: 10px;" >
+								{% endif %}
+							{% endfor %}
+						</div>
+						<div>{{ match.opponent | truncatechars:10 }}</div>
+					{% endfor %}
+				</div>
+			{% else %}
+				<p>No match history available.</p>
+			{% endif %}
 		</section>
 		
 		{% if request.user.is_authenticated and is_self == True %}
