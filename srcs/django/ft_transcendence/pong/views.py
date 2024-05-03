@@ -13,6 +13,10 @@ def pong_game(request):
     return render(request, 'game.html')
 
 def play(request):
+    if 'HTTP_HX_REQUEST' in request.META:
+        context = {"request": request}
+        html = render_block_to_string('play.html', 'body', context)
+        return HttpResponse(html)
     return render(request, 'play.html')
 
 def quick_play(request):
