@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0014_remove_profile_losses_remove_profile_wins_and_more'),
+        ('accounts', '0014_alter_profile_description'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='profile',
             name='description',
-            field=models.CharField(default="Serpent's Wrath: A nimble warrior skilled in dual-wielding blades, striking with venomous speed."),
+            field=models.CharField(default='Stormbringer: A tempestuous warrior harnessing the power of lightning, striking fear into foes.'),
         ),
     ]

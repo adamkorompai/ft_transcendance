@@ -32,7 +32,7 @@
     {% for request in friend_requests %}
     <div class="request_card">
         <a 
-            hx-get="/accounts/profile/{{ request.sender.username}}"
+            href="/accounts/profile/{{ request.sender.username}}"
             hx-target="#app-root"
             hx-push-url="true">
             <img src="{{ request.sender.profile.image.url }}" width="48px" height="48px" alt="profile picture">
@@ -70,7 +70,7 @@
         {% if usr != request.user and usr not in friends and usr not in blocklist %}
             <div class="user_card">
                 <a 
-                    hx-get="/accounts/profile/{{ usr.username }}"
+                    href="/accounts/profile/{{ usr.username }}"
                     hx-target="#app-root"
                     hx-push-url="true">
                     <img src="{{ usr.profile.image.url }}" width="48px" height="48px" alt="profile picture">
@@ -91,7 +91,7 @@
         {% for blocked_user in blocklist %}
         <div class="user_card">
             <a 
-                hx-get="/accounts/profile/{{ blocked_user.username }}"
+                href="/accounts/profile/{{ blocked_user.username }}"
                 hx-target="#app-root"
                 hx-push-url="true">
                 <img src="{{ blocked_user.profile.image.url }}" width="48px" height="48px" alt="profile picture">

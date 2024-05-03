@@ -214,6 +214,7 @@
 							src="{{ f.profile.image.url }}"
 							width="48px"
 							height="48px"
+							class="rounded-circle"
 							alt="profile picture"
 						>
 					</a>
@@ -238,7 +239,13 @@
 						hx-get="/accounts/profile/{{ request.sender.username}}"
 						hx-target="#app-root"
 						hx-push-url="true">
-						<img src="{{ request.sender.profile.image.url }}" width="48px" height="48px" alt="profile picture">
+						<img
+							src="{{ request.sender.profile.image.url }}"
+							width="48px"
+							height="48px"
+							class="rounded-circle"
+							alt="profile picture"
+						>
 					</a>
 					<div>
 						<p><b>{{ request.sender | capfirst }}</b></p>
@@ -281,7 +288,13 @@
 								hx-get="/accounts/profile/{{ usr.username }}"
 								hx-target="#app-root"
 								hx-push-url="true">
-								<img src="{{ usr.profile.image.url }}" width="48px" height="48px" alt="profile picture">
+								<img
+									src="{{ usr.profile.image.url }}"
+									width="48px"
+									height="48px"
+									class="rounded-circle"
+									alt="profile picture"
+								>
 							</a>
 							<p>{{ usr.username }}</p>
 						</div>
@@ -307,7 +320,13 @@
 							hx-get="/accounts/profile/{{ blocked_user.username }}"
 							hx-target="#app-root"
 							hx-push-url="true">
-							<img src="{{ blocked_user.profile.image.url }}" width="48px" height="48px" alt="profile picture">
+							<img
+								src="{{ blocked_user.profile.image.url }}"
+								width="48px"
+								height="48px"
+								class="rounded-circle"
+								alt="profile picture"
+							>
 						</a>
 						<p>{{ blocked_user.username }}</p>
 					</div>
