@@ -18,3 +18,16 @@ function generateRoom(userId) {
 
     document.getElementById(formId).submit();
 }
+
+<script>
+    window.onload = function() {
+        // Fetch the announcement content from Django template
+        var announcementContent = "{{ announcement.content }}";
+
+        // Check if there is an announcement
+        if (announcementContent) {
+            // Display the announcement as a pop-up window
+            alert(announcementContent);
+        }
+    };
+</script>
