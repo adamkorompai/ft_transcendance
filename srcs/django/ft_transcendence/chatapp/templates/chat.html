@@ -51,7 +51,11 @@ Chat
                     <img src="{{ i.profile.image.url }}" alt="User Image" class="user-image">
                     <span>{{ i.profile.user.username }}</span>
                     <form id="create-room-form-{{ i.profile.user.id }}" action="{% url 'create_room' %}" method="post" class="user-form">
-                        {% csrf_token %}
+                        {%if csrf_token %}
+                            {% csrf_token %}
+                        {%else%}
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ my_csrf }}">
+                        {%endif%}
                         <input type="hidden" name="name" value="">
                         <input type="hidden" name="slug" value="">
                         <input type="hidden" name="user2_id" value="{{ i.profile.user.id }}">

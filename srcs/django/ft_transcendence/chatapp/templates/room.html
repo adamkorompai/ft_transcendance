@@ -143,75 +143,78 @@ Chat
     </svg>
   </button>
   </div>
+
+  <script>
+    const roomSlug = "{{ slug }}";
+    const roomName = "{{ room_name }}";
+    const username = "{{ request.user.username }}";
+    const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/" + roomSlug + "/");
+  
+    chatSocket.onopen = function (e) {
+      console.log("The connection was set up successfully!");
+    };
+  
+    chatSocket.onclose = function (e) {
+      console.error("Chat socket closed unexpectedly.");
+    };
+  
+    document.querySelector("#id_message_send_input").focus();
+    document.querySelector("#id_message_send_input").onkeyup = function (e) {
+      if (e.keyCode === 13) {  // Enter key
+        document.querySelector("#id_message_send_button").click();
+      }
+    };
+  
+    document.querySelector("#id_message_send_button").onclick = function (e) {
+      const messageInputDom = document.querySelector("#id_message_send_input");
+      const message = messageInputDom.value;
+      chatSocket.send(JSON.stringify({ 
+        message: message, 
+        username: username, 
+        room_name: roomName 
+      }));
+      messageInputDom.value = ""; // Clear the message input field.
+    };
+  
+    chatSocket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      const messageElement = document.createElement("div");
+      messageElement.innerText = data.message;
+  
+      // Apply different classes based on the sender
+      if (data.username === username) {
+        messageElement.className = "message own-message";
+      } else {
+        messageElement.className = "message other-message";
+      }
+  
+      document.querySelector("#id_chat_item_container").appendChild(messageElement);
+    };
+  
+    function updateChatHeader() {
+        const usernames = roomSlug.split('_'); // Split the slug to get both usernames
+        const otherUsername = usernames.find(u => u !== username); // Find the username that is not the current user's
+        document.getElementById('chatWith').textContent = `${otherUsername}`;
+  
+        const profileUrl = `https://localhost:8000/accounts/profile/${otherUsername}`;
+        document.getElementById('viewProfile').href = profileUrl;
+    }
+  
+    document.getElementById('invitePlayer').addEventListener('click', function() {
+        // Code to invite a player
+        alert('Invite player clicked!');
+    });
+  
+    document.getElementById('blockUser').addEventListener('click', function() {
+        // Code to block a user
+        alert('Block user clicked!');
+    });
+  
+    updateChatHeader();
+  
+  </script>
 {% endblock %}
+
 {% block script_body %}
-<script>
-  const roomSlug = "{{ slug }}";
-  const roomName = "{{ room_name }}";
-  const username = "{{ request.user.username }}";
-  const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/" + roomSlug + "/");
 
-  chatSocket.onopen = function (e) {
-    console.log("The connection was set up successfully!");
-  };
-
-  chatSocket.onclose = function (e) {
-    console.error("Chat socket closed unexpectedly.");
-  };
-
-  document.querySelector("#id_message_send_input").focus();
-  document.querySelector("#id_message_send_input").onkeyup = function (e) {
-    if (e.keyCode === 13) {  // Enter key
-      document.querySelector("#id_message_send_button").click();
-    }
-  };
-
-  document.querySelector("#id_message_send_button").onclick = function (e) {
-    const messageInputDom = document.querySelector("#id_message_send_input");
-    const message = messageInputDom.value;
-    chatSocket.send(JSON.stringify({ 
-      message: message, 
-      username: username, 
-      room_name: roomName 
-    }));
-    messageInputDom.value = ""; // Clear the message input field.
-  };
-
-  chatSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    const messageElement = document.createElement("div");
-    messageElement.innerText = data.message;
-
-    // Apply different classes based on the sender
-    if (data.username === username) {
-      messageElement.className = "message own-message";
-    } else {
-      messageElement.className = "message other-message";
-    }
-
-    document.querySelector("#id_chat_item_container").appendChild(messageElement);
-  };
-
-  function updateChatHeader() {
-      const usernames = roomSlug.split('_'); // Split the slug to get both usernames
-      const otherUsername = usernames.find(u => u !== username); // Find the username that is not the current user's
-      document.getElementById('chatWith').textContent = `${otherUsername}`;
-
-      const profileUrl = `http://localhost:8000/accounts/profile/${otherUsername}`;
-      document.getElementById('viewProfile').href = profileUrl;
-  }
-
-  document.getElementById('invitePlayer').addEventListener('click', function() {
-      // Code to invite a player
-      alert('Invite player clicked!');
-  });
-
-  document.getElementById('blockUser').addEventListener('click', function() {
-      // Code to block a user
-      alert('Block user clicked!');
-  });
-
-  updateChatHeader();
-
-</script>
 {% endblock %}

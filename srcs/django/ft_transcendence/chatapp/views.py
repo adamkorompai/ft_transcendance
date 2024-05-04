@@ -6,6 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 from accounts.models import Profile
 from render_block import render_block_to_string
+from django.middleware.csrf import get_token
 
 # Create your views here.
 @login_required
@@ -27,6 +28,7 @@ def chat_page(request):
         "profiles": profile,
         "friends" : friends,
         "request": request,
+        'my_csrf': get_token(request),
     }
     if 'HTTP_HX_REQUEST' in request.META:
         html = render_block_to_string('chat.html', 'body', context)

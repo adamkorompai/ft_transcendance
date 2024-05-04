@@ -545,10 +545,10 @@ header {
                              LEADERBOARD
 *******************************************************************************/
 
-.table {
-    border-radius: 10px;
+/* .table {
     overflow: hidden;
-}
+    border-radius: 10px;
+} */
 
 .table_header h1 {
     font-size: 32px;
@@ -725,4 +725,19 @@ h2 {
     width: 10px;
     border-radius: 20px;
     background-color: tomato;
+}
+
+
+/* STATS */
+
+.table th,
+.table td {
+    border: none;
+}
+.table {
+    overflow: hidden;
+    border-radius: 10px;
+}
+.table tbody tr {
+    border-bottom: none;
 }

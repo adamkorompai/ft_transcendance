@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import UserStats
 from django.db.models import F
+from render_block import render_block_to_string
+from django.http import HttpResponse
 
 @login_required
 def user_stats(request):
@@ -62,5 +64,9 @@ def user_stats(request):
         'top_by_wins': top_by_wins,
         'top_by_total_games': top_by_total_games,
         'top_by_win_ratio': top_by_win_ratio,
+        'request': request,
     }
+    if 'HTTP_HX_REQUEST' in request.META:
+        html = render_block_to_string('stats/user_stats.html', 'body', context)
+        return HttpResponse(html)
     return render(request, 'stats/user_stats.html', context)
