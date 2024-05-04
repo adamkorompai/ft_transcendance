@@ -8,9 +8,6 @@ django.setup()
 from django.contrib.auth.models import User
 from stats.models import UserStats
 
-# Supprime toutes les instances de UserStats
-UserStats.objects.all().delete()
-
 users = User.objects.all()
 for user in users:
     total_games = random.randint(10, 100)
@@ -18,18 +15,30 @@ for user in users:
     losses = total_games - wins
     goals_scored = random.randint(0, 200)
     goals_conceded = random.randint(0, 100)
-    time_played = random.randint(60, 600)  # Entre 1 heure et 10 heures
+    time_played = random.randint(1, 60)  # Entre 1 min et 1 heures
     nb_defense = random.randint(0, 150)
     
-    # Générer l'historique des matchs pour chaque utilisateur
+    # Récup l'instance UserStats pour l'user
+    user_stats, created = UserStats.objects.get_or_create(user=user)
+    
+    # MAJ les champs de l'instance UserStats avec datas
+    user_stats.total_games = total_games
+    user_stats.wins = wins
+    user_stats.losses = losses
+    user_stats.goals_scored = goals_scored
+    user_stats.goals_conceded = goals_conceded
+    user_stats.time_played = time_played
+    user_stats.nb_defense = nb_defense
+    
+    # historique des matchs
     match_history = []
     for _ in range(total_games):
         opponent = random.choice(users)
         while opponent == user:
             opponent = random.choice(users)
         
-        user_score = random.randint(0, 9)
-        opponent_score = random.randint(0, 9)
+        user_score = random.randint(0, 10)
+        opponent_score = random.randint(0, 10)
         
         match_data = {
             'opponent': opponent.username,
@@ -38,16 +47,8 @@ for user in users:
         }
         match_history.append(match_data)
     
-    UserStats.objects.create(
-        user=user,
-        total_games=total_games,
-        wins=wins,
-        losses=losses,
-        goals_scored=goals_scored,
-        goals_conceded=goals_conceded,
-        time_played=time_played,
-        nb_defense=nb_defense,
-        match_history=match_history
-    )
+    user_stats.match_history = match_history
 
-print("Statistiques des utilisateurs générées avec succès.")
+    user_stats.save()
+
+print("Statistiques des utilisateurs mises à jour avec succès.")

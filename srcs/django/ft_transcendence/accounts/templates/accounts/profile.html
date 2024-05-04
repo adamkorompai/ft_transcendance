@@ -167,15 +167,15 @@
 			{% if user_stats %}
 				<div style="display: grid; grid-template-columns: auto 40px 130px 40px auto; gap: 10px;">
 					{% for match in user_stats.match_history %}
-						<div style="text-align: right;">Me</div>
+						<div style="text-align: right;">{{ displayed_user.username }}</div>
 						<div style="width: 30px; height: 30px;">
-							<img src="{{ request.user.profile.image.url }}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.user_score > match.opponent_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}">
+							<img src="{{ displayed_user.profile.image.url }}" alt="Profile Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.user_score > match.opponent_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}">
 						</div>
 						<div style="font-family: Courier; font-size: 20px; text-align: center;">[{{ match.user_score }}] - [{{ match.opponent_score }}]</div>
 						<div style="width: 30px; height: 30px;">
 							{% for usr in all_users %}
 								{% if usr.username == match.opponent %}
-									<img src="{{ usr.profile.image.url }}" alt="Opponent Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.opponent_score > match.user_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}; margin-left: 10px;" >
+									<img src="{{ usr.profile.image.url }}" alt="Opponent Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.opponent_score > match.user_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}; margin-left: 10px;">
 								{% endif %}
 							{% endfor %}
 						</div>
@@ -187,7 +187,7 @@
 			{% endif %}
 		</section>
 		
-		{% if request.user.is_authenticated and is_self == True %}
+		{% if request.user.is_authenticated %} <!-- remove:  and is_self == True -->
 		<aside
 			id="profile_widget"
 			class="__bg-secondary p-3 mt-3 mt-md-0 rounded-2 ms-0 ms-md-2"
