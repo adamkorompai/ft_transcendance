@@ -546,12 +546,7 @@ header {
 *******************************************************************************/
 
 .table {
-    padding-top: 0;
-    margin: 40px 0;
-    background-color: var(--bg-layer1);
-    border-radius: 20px;
-    border: 1px solid var(--accent);
-    box-shadow: 0 0.4rem .8rem var(--secondary-bg-color);
+    border-radius: 10px;
     overflow: hidden;
 }
 

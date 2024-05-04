@@ -9,10 +9,30 @@ from math import ceil, log2
 from django.db.models import Max
 from django.templatetags.static import static
 from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from stats.models import UserStats
+import json
 
 # Create your views here.
 def pong_game(request):
-    return render(request, 'game.html')
+    player1_username = request.GET.get('player1')
+    player2_username = request.GET.get('player2')
+
+    player1 = get_object_or_404(User, username=player1_username)
+    player1_stats, _ = UserStats.objects.get_or_create(user=player1)
+
+    if player2_username:
+        player2 = get_object_or_404(User, username=player2_username)
+        player2_stats, _ = UserStats.objects.get_or_create(user=player2)
+    else:
+        player2_stats = None
+
+    context = {
+        'player1_stats': player1_stats,
+        'player2_stats': player2_stats,
+    }
+
+    return render(request, 'game.html', context)
 
 def play(request):
     if 'HTTP_HX_REQUEST' in request.META:
@@ -167,3 +187,67 @@ def check_user(request, username):
     except User.DoesNotExist:
         default_image = static('../media/default.png')
         return JsonResponse({'exists': False, 'profile_image': default_image})
+
+def save_game_stats(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        player1_username = data['player1']
+        player2_username = data['player2']
+        player1_score = data['player1_score']
+        player2_score = data['player2_score']
+        time_played = data['time_played']
+        player1_nb_defense = data['player1_nb_defense']
+        player2_nb_defense = data['player2_nb_defense']
+
+        player1 = User.objects.get(username=player1_username)
+        player1_stats = UserStats.objects.get(user=player1)
+
+        player1_stats.total_games += 1
+        player1_stats.goals_scored += player1_score
+        player1_stats.goals_conceded += player2_score
+        player1_stats.time_played += time_played
+        player1_stats.nb_defense += player1_nb_defense
+
+        if player1_score > player2_score:
+            player1_stats.wins += 1
+        else:
+            player1_stats.losses += 1
+
+        # Créer un dico pour le match du joueurs principale
+        match_data = {
+            'opponent': player2_username,
+            'player_score': player1_score,
+            'opponent_score': player2_score
+        }
+        player1_stats.match_history.append(match_data)
+
+        player1_stats.save()
+
+        if player2_username:
+            player2 = User.objects.get(username=player2_username)
+            player2_stats = UserStats.objects.get(user=player2)
+
+            player2_stats.total_games += 1
+            player2_stats.goals_scored += player2_score
+            player2_stats.goals_conceded += player1_score
+            player2_stats.time_played += time_played
+            player2_stats.nb_defense += player2_nb_defense
+
+            if player2_score > player1_score:
+                player2_stats.wins += 1
+            else:
+                player2_stats.losses += 1
+
+            # Créer un dico pour le match pour du joueurs adv
+            match_data_player2 = {
+                'opponent': player1_username,
+                'player_score': player2_score,
+                'opponent_score': player1_score
+            }
+            player2_stats.match_history.append(match_data_player2)
+
+            player2_stats.save()
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error'})
