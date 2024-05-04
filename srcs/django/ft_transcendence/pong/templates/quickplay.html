@@ -13,21 +13,20 @@
 
     .container {
         display: flex;
-        height: 50vh;
+        height: 35vh;
         justify-content: space-between;
     }
 
     .box {
-        width: 40%; /* Adjust the width as needed */
+        width: 45%;
+        height: 280px;
+        background-color: #7011F4;
+        border: 2px solid #1C1A24;
+        border-radius: 10px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 80%; /* Adjust the height as needed */
-        border: 2px solid #000;
-        box-sizing: border-box;
-        margin: 0 5%; /* Adjust the margin to add space between boxes */
-        position: relative;
     }
 
     .box:nth-child(1) {
@@ -96,48 +95,97 @@
 {% block body %}
 <body>
     <div class="container">
-        <div class="box">
+        <div class="box" style="border-radius: 10px;">
             <div class="user-info">
-                <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image">
+                <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image" style="border-radius: 50%;">
                 <h2>{{ request.user.username }}</h2>
             </div>
             <div class="ready-box ready-red" onclick="toggleReady(this)">
                 <p>Ready ?</p>
             </div>
         </div>
-        <div class="box">
-            <div class="user-info"> <!-- Corrected class name here -->
-                <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image">
-                <input type="text" class="username-input" placeholder="Enter Username">
-                <div class="ready-box ready-red" onclick="toggleReady(this)">
+        <div class="box" style="border-radius: 10px;">
+            <div class="user-info">
+                <img id="opponent-image" src="{% static '../media/default.png' %}" alt="Opponent Image" class="user-image" style="border-radius: 50%;">
+                <input type="text" id="opponent-username" class="username-input" placeholder="Enter Username" oninput="validateOpponentDebounced()">
+                <div class="ready-box ready-red disabled" onclick="toggleReady(this)">
                     <p>Ready ?</p>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
         var player1ready = false;
         var player2ready = false;
-    
+        let opponentValid = false;
+
         function toggleReady(element) {
-            element.classList.toggle('ready-red');
-            element.classList.toggle('ready-green');
-    
-            // Check if both players are ready
-            var allBoxes = document.querySelectorAll('.ready-box');
-            var allGreen = true;
-            allBoxes.forEach(function(box) {
-                if (!box.classList.contains('ready-green')) {
-                    allGreen = false;
+            if (!element.classList.contains('disabled')) {
+                element.classList.toggle('ready-red');
+                element.classList.toggle('ready-green');
+                
+                // Check if both players are ready
+                var allBoxes = document.querySelectorAll('.ready-box');
+                var allGreen = true;
+                
+                allBoxes.forEach(function(box) {
+                    if (!box.classList.contains('ready-green') || box.classList.contains('disabled')) {
+                        allGreen = false;
+                    }
+                });
+                
+                // If both players are ready and valid, redirect after 2 seconds
+                if (allGreen && opponentValid) {
+                    const player1Username = "{{ request.user.username }}";
+                    const player2Username = document.getElementById('opponent-username').value.trim();
+
+                    setTimeout(function() {
+                        window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
+                    }, 2000);
                 }
-            });
-    
-            // If both players are ready, redirect after 2 seconds
-            if (allGreen) {
-                setTimeout(function() {
-                    window.location.href = "{% url 'pong_game' %}";
-                }, 2000);
             }
+        }
+
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func(...args), delay);
+            };
+        };
+
+        const validateOpponentDebounced = debounce(validateOpponent, 500);
+
+        function validateOpponent() {
+            var opponentInput = document.getElementById('opponent-username');
+            var opponentImage = document.getElementById('opponent-image');
+            var opponentName = opponentInput.value.trim();
+            var readyBox = document.querySelector('.user-info:last-child .ready-box');
+
+            if (opponentName === '') {
+                opponentImage.src = "{% static '../media/default.png' %}";
+                opponentValid = false;
+                readyBox.classList.add('disabled');
+                return;
+            }
+
+            fetch('/play/check-user/' + opponentName + '/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        opponentImage.src = data.profile_image;
+                        opponentValid = true;
+                        readyBox.classList.remove('disabled');
+                    } else {
+                        opponentImage.src = "{% static '../media/default.png' %}";
+                        opponentValid = false;
+                        readyBox.classList.add('disabled');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
     </script>
 </body>
