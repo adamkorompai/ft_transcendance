@@ -200,39 +200,41 @@
 			<!--/////////////////////////////////////////////-->
 			<!--                 FRIEND LIST                 -->
 			<!--/////////////////////////////////////////////-->
-			<h5>Friends ({{ friends | length }})</h5>
-			<div class="users_list" id="friends_cards">
-				{% for f in friends %}
-				<div
-					class="d-flex flex-column align-items-center p-3"
-					style="background-color: #2d2b34;">
-					<a 
-						href="/accounts/profile/{{ f.username }}"
-						hx-target="#app-root"
-						hx-push-url="true">
-						<img
-							src="{{ f.profile.image.url }}"
-							width="48px"
-							height="48px"
-							class="rounded-circle"
-							alt="profile picture"
-						>
-					</a>
-					<p>{{ f.username }}</p>
+			{% if request.user.is_authenticated and is_self == True%}
+				<h5>Friends ({{ friends | length }})</h5>
+				<div class="users_list" id="friends_cards">
+					{% for f in friends %}
+					<div
+						class="d-flex flex-column align-items-center p-3"
+						style="background-color: #2d2b34;">
+						<a 
+							href="/accounts/profile/{{ f.username }}"
+							hx-target="#app-root"
+							hx-push-url="true">
+							<img
+								src="{{ f.profile.image.url }}"
+								width="48px"
+								height="48px"
+								class="rounded-circle"
+								alt="profile picture"
+							>
+						</a>
+						<p>{{ f.username }}</p>
+					</div>
+					{% endfor %}
 				</div>
-				{% endfor %}
-			</div>
+			{% endif %}
 
 			<!--/////////////////////////////////////////////-->
 			<!--               FRIEND REQUEST                -->
 			<!--/////////////////////////////////////////////-->
-			<h5 class="mt-2">Friend Requests</h5>
-			<div
-				data-id="{{id}}"
-				{%if csrf_token %} data-csrf="{{ csrf_token }}" {%else%} data-csrf="{{ my_csrf }}" {%endif%}
-				id="widget_status_bar"
-			>
 			{% if request.user.is_authenticated and is_self == True%}
+				<h5 class="mt-2">Friend Requests</h5>
+				<div
+					data-id="{{id}}"
+					{%if csrf_token %} data-csrf="{{ csrf_token }}" {%else%} data-csrf="{{ my_csrf }}" {%endif%}
+					id="widget_status_bar"
+				>
 				{% for request in friend_requests %}
 				<div class="request_card">
 					<a 
@@ -270,8 +272,8 @@
 					</div>
 				</div>
 				{% endfor %}
-			{% endif %}
 			</div>
+			{% endif %}
 
 			<!--/////////////////////////////////////////////-->
 			<!--                  ALL USERS                  -->
@@ -306,9 +308,9 @@
 			<!--/////////////////////////////////////////////-->
 			<!--                  BLOCKED                    -->
 			<!--/////////////////////////////////////////////-->
-			<h5 class="mt-2">Blocked</h5>
-			<div class="users_list mt-2">
 			{% if request.user.is_authenticated and is_self == True %}
+				<h5 class="mt-2">Blocked</h5>
+				<div class="users_list mt-2">
 
 				{% if blocklist|length > 0 %}
 

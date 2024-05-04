@@ -37,8 +37,8 @@ for user in users:
         while opponent == user:
             opponent = random.choice(users)
         
-        user_score = random.randint(0, 10)
-        opponent_score = random.randint(0, 10)
+        user_score = random.randint(0, 9)
+        opponent_score = random.randint(0, 9)
         
         match_data = {
             'opponent': opponent.username,
