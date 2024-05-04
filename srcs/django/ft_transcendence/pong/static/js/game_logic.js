@@ -210,3 +210,20 @@ function gameLoop() {
 
 // Start the game loop
 setInterval(gameLoop, 10); // Run the game loop every 10 milliseconds 
+
+//recup et envoyer requete ajax mais a completer!!! et verif le nom de variable avec views.py:
+// fetch("{% url 'save_game_stats' %}", {
+//     method: 'POST',
+//     headers: {
+//         'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//         player1: player1Username,
+//         player2: player2Username,
+//         player1_score: player1Score,
+//         player2_score: player2Score,
+//         time_played: timePlayed,
+//         player1_nb_defense: player1Defense,
+//         player2_nb_defense: player2Defense,
+//     }),
+// })
