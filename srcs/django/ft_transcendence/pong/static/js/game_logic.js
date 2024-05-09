@@ -137,17 +137,21 @@ function update() {
         ball.x + ball.dx > rightPaddle.x &&
         ball.x + ball.dx < rightPaddle.x + rightPaddle.width &&
         ball.y > rightPaddle.y &&
-        ball.y < rightPaddle.y + rightPaddle.height
+        ball.y < rightPaddle.y + rightPaddle.height &&
+        ball.x + ball.radius > rightPaddle.x
     ) {
         ball.dx = -ball.dx;
+        ball.dy = (Math.random() - 0.5) * 6;
         rightPaddle.defense++;
     } else if (
         ball.x + ball.dx < leftPaddle.x + leftPaddle.width &&
         ball.x + ball.dx > leftPaddle.x &&
         ball.y > leftPaddle.y &&
-        ball.y < leftPaddle.y + leftPaddle.height
+        ball.y < leftPaddle.y + leftPaddle.height &&
+        ball.x - ball.radius < leftPaddle.x + leftPaddle.width
     ) {
         ball.dx = -ball.dx;
+        ball.dy = (Math.random() - 0.5) * 6;
         leftPaddle.defense++;
     }
 
@@ -158,7 +162,7 @@ function update() {
             goalScored = true; // Set goal scored flag
             leftPaddle.score++;
             if (leftPaddle.score >= 3) {
-                endGame('Player 1');
+                endGame(player1Username);
             } else {
                 setTimeout(function() {
                     resetBall();
@@ -172,7 +176,7 @@ function update() {
             goalScored = true; // Set goal scored flag
             rightPaddle.score++;
             if (rightPaddle.score >= 3) {
-                endGame('Player 2');
+                endGame(player2Username);
             } else {
                 setTimeout(function() {
                     resetBall();
@@ -188,7 +192,7 @@ function endGame(winner) {
     stopTimer();
     clearInterval(gameLoop);
 
-    alert(`Game Over! ${winner} wins! stats scores: P1: ${leftPaddle.score} P2: ${rightPaddle.score}, defenses: P1: ${leftPaddle.defense} P2: ${rightPaddle.defense} time played: ${elapsedTime} `);
+    alert(`Game Over! ${winner} wins!`);
 
     // Save des stats du jeu
     fetch("/play/save-game-stats/", {
@@ -256,21 +260,4 @@ function gameLoop() {
 
 // Start the game loop
 startTimer();
-setInterval(gameLoop, 10); // Run the game loop every 10 milliseconds 
-
-//recup et envoyer requete ajax mais a completer!!! et verif le nom de variable avec views.py:
-// fetch("{% url 'save_game_stats' %}", {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//         player1: player1Username,
-//         player2: player2Username,
-//         player1_score: player1Score,
-//         player2_score: player2Score,
-//         time_played: timePlayed,
-//         player1_nb_defense: player1Defense,
-//         player2_nb_defense: player2Defense,
-//     }),
-// })
+setInterval(gameLoop, 10); // Run the game loop every 10 milliseconds
