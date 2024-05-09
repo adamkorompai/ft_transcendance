@@ -88,7 +88,7 @@
 										<!--                UNBLOCK                  -->
 										<!--/////////////////////////////////////////-->
 										<button
-											onclick='blockUnblock("{{ id }}", "unblock")' 
+											onclick='blockUnblock("{{ id }}", "unblock", "false")' 
 											class="btn_requests">
 											Unblock
 										</button>
@@ -107,7 +107,7 @@
 										<!--               BLOCK                 -->
 										<!--/////////////////////////////////////-->
 										<button
-											onclick='blockUnblock("{{ id }}", "block")' 
+											onclick='blockUnblock("{{ id }}", "block", "false")' 
 											class="btn_requests">
 											Block
 										</button>
@@ -140,7 +140,7 @@
 								<!--                   BLOCK                     -->
 								<!--/////////////////////////////////////////////-->
 								<button 
-									onclick='blockUnblock("{{ id }}", "block")' 
+									onclick='blockUnblock("{{ id }}", "block", "false")' 
 									class="btn_requests" 
 									id="id_block_btn">
 									Block

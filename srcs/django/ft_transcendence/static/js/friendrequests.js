@@ -206,7 +206,7 @@ function onFriendRemoved() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function blockUnblock(id, action) {
+function blockUnblock(id, action, fromChat) {
     var url = `/accounts/blocking?user_id=${id}&action=${action}`
     $.ajax({
         type: "GET",
@@ -214,7 +214,7 @@ function blockUnblock(id, action) {
         url: url,
         timaout: 5000,
         success: function(data) {
-            onBlockedUnblocked(action);
+            onBlockedUnblocked(action, fromChat);
         },
         error: function(data) {
             alert(data['response'], 'Error');
@@ -225,13 +225,17 @@ function blockUnblock(id, action) {
     })
 }
 
-function onBlockedUnblocked(action) {
+function onBlockedUnblocked(action, fromChat) {
     var status_bar = document.getElementById("header_status_bar");
     status_bar.innerHTML = ""
     id = status_bar.getAttribute("data-id");
     csrf = status_bar.getAttribute("data-csrf")
 
-    if (action === "block") {
+    if (fromChat === "true") {
+        // redirect to global chat page
+        redirectToPage("/chatapp/");
+    }
+    else if (action === "block") {
         unblock_btn = createBlockUnblockBtn(id, "unblock");
         status_bar.append(unblock_btn);
     } else {
@@ -239,6 +243,11 @@ function onBlockedUnblocked(action) {
         block_btn = createBlockUnblockBtn(id, "block");
         status_bar.append(add_friend_btn, block_btn);
     };
+}
+
+function redirectToPage(url) {
+    const host = window.location.host
+    window.location.href = `${host}${url}`;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

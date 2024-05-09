@@ -46,3 +46,4 @@ function generateRoom(userId) {
 function initChat(slug, room_name, username) {
     
 }
+
