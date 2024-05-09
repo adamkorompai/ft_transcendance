@@ -16,9 +16,13 @@
         height: 35vh;
         justify-content: space-between;
     }
-
+    .container {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px;
+    }
     .box {
-        width: 45%;
+        flex: 0 0 45%;
         height: 280px;
         background-color: #7011F4;
         border: 2px solid #1C1A24;
@@ -28,7 +32,12 @@
         justify-content: center;
         align-items: center;
     }
-
+    h2 {
+        margin: 10px 0;
+    }
+    .button {
+        margin-top: 20px;
+    }
     .box:nth-child(1) {
         background-color: #7011F4;
     }
@@ -89,6 +98,51 @@
     .ready-green {
         background-color: #00ff00;
     }
+    .suggestion-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        max-height: 400px;
+        overflow-y: auto;
+        border-top: none;
+        border: none;
+        box-sizing: border-box;
+        position: absolute;
+        top: calc(100% - 11px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        background-color: #413d53;
+        z-index: 1;
+        border-top: none;
+        border-radius: 5px 5px 5px 5px;
+
+    }
+
+    .suggestion-list li {
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .suggestion-list li:hover {
+        background-color: #1900ff;
+    }
+    .opponent-input-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .username-input {
+        width: 80%;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
 </style>
 {% endblock %}
 
@@ -100,15 +154,18 @@
                 <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image" style="border-radius: 50%;">
                 <h2>{{ request.user.username }}</h2>
             </div>
-            <div class="ready-box ready-red" onclick="toggleReady(this)">
+            <div class="ready-box ready-red" onclick="toggleReady(this)" style="border-radius: 5px;">
                 <p>Ready ?</p>
             </div>
         </div>
         <div class="box" style="border-radius: 10px;">
             <div class="user-info">
                 <img id="opponent-image" src="{% static '../media/default.png' %}" alt="Opponent Image" class="user-image" style="border-radius: 50%;">
-                <input type="text" id="opponent-username" class="username-input" placeholder="Enter Username" oninput="validateOpponentDebounced()">
-                <div class="ready-box ready-red disabled" onclick="toggleReady(this)">
+                <div class="opponent-input-container">
+                    <input type="text" id="opponent-username" class="username-input" placeholder="Enter Username" oninput="searchOpponents()">
+                    <ul id="opponent-suggestions" class="suggestion-list"></ul>
+                </div>
+                <div class="ready-box ready-red disabled" onclick="toggleReady(this)" style="border-radius: 5px;">
                     <p>Ready ?</p>
                 </div>
             </div>
@@ -124,6 +181,13 @@
             if (!element.classList.contains('disabled')) {
                 element.classList.toggle('ready-red');
                 element.classList.toggle('ready-green');
+
+                var opponentInput = document.getElementById('opponent-username');
+                if (element.classList.contains('ready-green')) {
+                    opponentInput.setAttribute('readonly', 'readonly');
+                } else {
+                    opponentInput.removeAttribute('readonly');
+                }
                 
                 // Check if both players are ready
                 var allBoxes = document.querySelectorAll('.ready-box');
@@ -187,6 +251,35 @@
                     console.error('Error:', error);
                 });
         }
+        function searchOpponents() {
+            var opponentInput = document.getElementById('opponent-username');
+            var opponentName = opponentInput.value.trim();
+            var suggestionList = document.getElementById('opponent-suggestions');
+
+            if (opponentName === '') {
+                suggestionList.innerHTML = '';
+                return;
+            }
+
+            fetch('/play/search-opponents/?query=' + encodeURIComponent(opponentName))
+                .then(response => response.json())
+                .then(data => {
+                    suggestionList.innerHTML = '';
+                    data.forEach(opponent => {
+                        var suggestionItem = document.createElement('li');
+                        suggestionItem.textContent = opponent.username;
+                        suggestionItem.addEventListener('click', function() {
+                            opponentInput.value = opponent.username;
+                            validateOpponent();
+                            suggestionList.innerHTML = '';
+                        });
+                        suggestionList.appendChild(suggestionItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }  
     </script>
 </body>
 {% endblock %}

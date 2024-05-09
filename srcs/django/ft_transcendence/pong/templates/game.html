@@ -6,43 +6,94 @@
 {% endblock %}
 
 {% block styles %}
-    <style>
-        body {
-            overflow: hidden;
-        }
-        .game-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 60px);
-        }
-        canvas {
-            border: 2px solid #1C1A24;
-            border-radius: 10px;
-        }
-        .pong-canvas {
-            background-color: blue;
-}
-    </style>
+<style>
+    body {
+        overflow: hidden;
+    }
+
+    .game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 400px);
+    }
+
+    canvas {
+        border: 2px solid #1C1A24;
+        border-radius: 10px;
+    }
+
+    .pong-canvas {
+        background-color: blue;
+    }
+
+    .player-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .player {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .player img {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 10px;
+    }
+
+    .player span {
+        text-align: center;
+    }
+
+    .restart-button {
+        /* display: none; */
+        margin-top: 20px;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-    <div style="display: flex; justify-content: space-between;">
-        <div style="position: relative; display: flex; flex-direction: column; align-items: flex-end;">
-            <img src="{{ player1_stats.user.profile.image.url }}" alt="Player 1" style="width: 100px; height: 100px;">
-            <span>{{ player1_stats.user.username }}</span>
-        </div>
-        <div style="position: relative; display: flex; flex-direction: column; align-items: flex-start;">
-            {% if player2_stats %}
-                <img src="{{ player2_stats.user.profile.image.url }}" alt="Player 2" style="width: 100px; height: 100px;">
-                <span>{{ player2_stats.user.username }}</span>
-            {% else %}
-                <span>Guest Player</span>
-            {% endif %}
-        </div>
+<div class="player-info">
+    <div class="player">
+        <img src="{{ player1_stats.user.profile.image.url }}" alt="Player 1">
+        <span>{{ player1_stats.user.username }}</span>
     </div>
-    <div class="game-container">
-        <canvas id="pongCanvas" class="pong-canvas" width="800" height="400"></canvas>
+    <div class="player">
+        {% if player2_stats %}
+        <img src="{{ player2_stats.user.profile.image.url }}" alt="Player 2">
+        <span>{{ player2_stats.user.username }}</span>
+        {% else %}
+        <span>Guest Player</span>
+        {% endif %}
     </div>
-    <script src="{% static 'js/game_logic.js' %}"></script>
+</div>
+<div class="game-container">
+    <canvas id="pongCanvas" class="pong-canvas" width="800" height="400"></canvas>
+</div>
+<button id="restartButton" class="mt-3" style="display: inline-block;" type="submit">
+    Restart Game
+</button>
+
+<script>
+    // Récupérer la valeur du jeton CSRF
+    var csrfToken = '{{ csrf_token }}';
+    var player1Username = '{{ player1_username }}';
+    var player2Username = '{{ player2_username }}';
+</script>
+
+<script src="{% static 'js/game_logic.js' %}"></script>
+<script>
+    document.getElementById("restartButton").addEventListener("click", function() {
+        const params = new URLSearchParams(window.location.search);
+        const player1 = params.get("player1");
+        const player2 = params.get("player2");
+        
+        window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1) + "&player2=" + encodeURIComponent(player2);
+    });
+</script>
 {% endblock %}

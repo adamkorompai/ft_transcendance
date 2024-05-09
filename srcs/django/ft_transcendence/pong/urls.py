@@ -13,4 +13,5 @@ urlpatterns = [
     path('end-tournament/<int:tournament_id>/', views.end_tournament, name='end_tournament'),
     path('check-user/<str:username>/', views.check_user, name='check_user'),
     path('save-game-stats/', views.save_game_stats, name='save_game_stats'),
+    path('search-opponents/', views.search_opponents, name='search_opponents'),
 ]

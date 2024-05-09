@@ -1,3 +1,6 @@
+// debut du chrono
+let elapsedTime = 0;
+
 // Define canvas and context
 const canvas = document.getElementById('pongCanvas');
 const ctx = canvas.getContext('2d');
@@ -18,6 +21,7 @@ let leftPaddle = {
     height: 50,
     dy: 0, // Paddle speed
     score: 0,
+    defense: 0,
 };
 
 let rightPaddle = {
@@ -27,6 +31,7 @@ let rightPaddle = {
     height: 50,
     dy: 0, // Paddle speed
     score: 0,
+    defense: 0,
 };
 
 let goalScored = false; // Variable to track if a goal has been scored
@@ -51,6 +56,16 @@ let zPressed = false;
 let sPressed = false;
 let upPressed = false;
 let downPressed = false;
+
+function startTimer() {
+    gameTimer = setInterval(function() {
+        elapsedTime++;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(gameTimer);
+}
 
 function keyDownHandler(e) {
     if (e.key === 'z') {
@@ -125,6 +140,7 @@ function update() {
         ball.y < rightPaddle.y + rightPaddle.height
     ) {
         ball.dx = -ball.dx;
+        rightPaddle.defense++;
     } else if (
         ball.x + ball.dx < leftPaddle.x + leftPaddle.width &&
         ball.x + ball.dx > leftPaddle.x &&
@@ -132,6 +148,7 @@ function update() {
         ball.y < leftPaddle.y + leftPaddle.height
     ) {
         ball.dx = -ball.dx;
+        leftPaddle.defense++;
     }
 
     // Check for scoring (ball past the paddles)
@@ -140,7 +157,7 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             leftPaddle.score++;
-            if (leftPaddle.score >= 7) {
+            if (leftPaddle.score >= 3) {
                 endGame('Player 1');
             } else {
                 setTimeout(function() {
@@ -154,7 +171,7 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             rightPaddle.score++;
-            if (rightPaddle.score >= 7) {
+            if (rightPaddle.score >= 3) {
                 endGame('Player 2');
             } else {
                 setTimeout(function() {
@@ -168,9 +185,38 @@ function update() {
 
 // Function to end the game
 function endGame(winner) {
+    stopTimer();
     clearInterval(gameLoop);
-    alert(`Game Over! ${winner} wins!`);
+
+    alert(`Game Over! ${winner} wins! stats scores: P1: ${leftPaddle.score} P2: ${rightPaddle.score}, defenses: P1: ${leftPaddle.defense} P2: ${rightPaddle.defense} time played: ${elapsedTime} `);
+
+    // Save des stats du jeu
+    fetch("/play/save-game-stats/", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken, 
+        },
+        body: JSON.stringify({
+            player1: player1Username,
+            player2: player2Username,
+            player1_score: leftPaddle.score,
+            player2_score: rightPaddle.score,
+            time_played: elapsedTime,
+            player1_nb_defense: leftPaddle.defense,
+            player2_nb_defense: rightPaddle.defense,
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur lors de la sauvegarde des statistiques du jeu');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
 }
+
 
 function resetBall() {
     ball.x = canvas.width / 2;
@@ -209,6 +255,7 @@ function gameLoop() {
 }
 
 // Start the game loop
+startTimer();
 setInterval(gameLoop, 10); // Run the game loop every 10 milliseconds 
 
 //recup et envoyer requete ajax mais a completer!!! et verif le nom de variable avec views.py:

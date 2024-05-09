@@ -17,7 +17,7 @@ def user_stats(request):
         
         total_goals = stats.goals_scored + stats.goals_conceded
         if total_goals > 0:
-            stats.goals_scored_ratio = round(stats.goals_scored / total_goals * 100, 2)
+            stats.goals_scored_ratio = round(stats.goals_scored / total_goals * 100, 2) 
             stats.goals_conceded_ratio = round(stats.goals_conceded / total_goals * 100, 2)
         else:
             stats.goals_scored_ratio = 0
@@ -40,6 +40,8 @@ def user_stats(request):
             stats.scored_ratio = 0
         stats.nb_defense_ratio = round(stats.nb_defense / stats.total_games, 2)
         stats.time_played_ratio = round(stats.time_played / stats.total_games, 2)
+        stats.goals_per_game = round(stats.goals_scored / stats.total_games, 2)
+        stats.goals_conceded_game = round(stats.goals_conceded / stats.total_games, 2)
     else:
         stats.win_ratio = 0
         stats.loss_ratio = 0
