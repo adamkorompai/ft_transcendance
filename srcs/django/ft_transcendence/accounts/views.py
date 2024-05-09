@@ -364,6 +364,7 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                         'all_users': User.objects.all(),
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
+                        'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:
@@ -396,6 +397,7 @@ def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
                         'all_users': User.objects.all(),
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
+                        'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                     payload['response'] = "Friend request declined"
