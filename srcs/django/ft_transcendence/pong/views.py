@@ -257,3 +257,14 @@ def search_opponents(request):
     opponents = User.objects.filter(username__istartswith=query)
     data = [{'username': opponent.username} for opponent in opponents]
     return JsonResponse(data, safe=False)
+
+def pong_ia_game(request):
+    player_username = request.GET.get('player')
+    player = get_object_or_404(User, username=player_username)
+    player_stats, _ = UserStats.objects.get_or_create(user=player)
+
+    context = {
+        'player_stats': player_stats,
+    }
+
+    return render(request, 'game_ia.html', context)

@@ -165,8 +165,8 @@
                     <input type="text" id="opponent-username" class="username-input" placeholder="Enter Username" oninput="searchOpponents()">
                     <ul id="opponent-suggestions" class="suggestion-list"></ul>
                 </div>
-                <div class="ready-box ready-red disabled" onclick="toggleReady(this)" style="border-radius: 5px;">
-                    <p>Ready ?</p>
+                <div class="ready-box ready-red" onclick="toggleReady(this)" style="border-radius: 5px;">
+                    <p><span id="ready-text">IA Game</span></p>
                 </div>
             </div>
         </div>
@@ -178,32 +178,27 @@
         let opponentValid = false;
 
         function toggleReady(element) {
-            if (!element.classList.contains('disabled')) {
-                element.classList.toggle('ready-red');
-                element.classList.toggle('ready-green');
-
-                var opponentInput = document.getElementById('opponent-username');
-                if (element.classList.contains('ready-green')) {
-                    opponentInput.setAttribute('readonly', 'readonly');
-                } else {
-                    opponentInput.removeAttribute('readonly');
+            element.classList.toggle('ready-red');
+            element.classList.toggle('ready-green');
+            
+            var allBoxes = document.querySelectorAll('.ready-box');
+            var allGreen = true;
+            
+            allBoxes.forEach(function(box) {
+                if (!box.classList.contains('ready-green') && !box.classList.contains('disabled')) {
+                    allGreen = false;
                 }
-                
-                // Check if both players are ready
-                var allBoxes = document.querySelectorAll('.ready-box');
-                var allGreen = true;
-                
-                allBoxes.forEach(function(box) {
-                    if (!box.classList.contains('ready-green') || box.classList.contains('disabled')) {
-                        allGreen = false;
-                    }
-                });
-                
-                // If both players are ready and valid, redirect after 2 seconds
-                if (allGreen && opponentValid) {
-                    const player1Username = "{{ request.user.username }}";
-                    const player2Username = document.getElementById('opponent-username').value.trim();
+            });
+            
+            if (allGreen) {
+                const player1Username = "{{ request.user.username }}";
+                const player2Username = document.getElementById('opponent-username').value.trim();
 
+                if (player2Username && opponentValid) {
+                    setTimeout(function() {
+                        window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
+                    }, 2000);
+                } else {
                     setTimeout(function() {
                         window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
                     }, 2000);
@@ -226,11 +221,11 @@
             var opponentImage = document.getElementById('opponent-image');
             var opponentName = opponentInput.value.trim();
             var readyBox = document.querySelector('.user-info:last-child .ready-box');
+            var readyText = document.getElementById('ready-text');
 
             if (opponentName === '') {
                 opponentImage.src = "{% static '../media/default.png' %}";
-                opponentValid = false;
-                readyBox.classList.add('disabled');
+                readyText.textContent = 'IA Game';
                 return;
             }
 
@@ -241,16 +236,19 @@
                         opponentImage.src = data.profile_image;
                         opponentValid = true;
                         readyBox.classList.remove('disabled');
+                        readyText.textContent = 'Ready ?';
                     } else {
                         opponentImage.src = "{% static '../media/default.png' %}";
                         opponentValid = false;
                         readyBox.classList.add('disabled');
+                        readyText.textContent = 'IA Game';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
+
         function searchOpponents() {
             var opponentInput = document.getElementById('opponent-username');
             var opponentName = opponentInput.value.trim();
