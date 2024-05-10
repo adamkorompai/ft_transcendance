@@ -220,12 +220,17 @@
             var opponentInput = document.getElementById('opponent-username');
             var opponentImage = document.getElementById('opponent-image');
             var opponentName = opponentInput.value.trim();
+            var playerName = "{{ request.user.username }}"
             var readyBox = document.querySelector('.user-info:last-child .ready-box');
             var readyText = document.getElementById('ready-text');
 
             if (opponentName === '') {
                 opponentImage.src = "{% static '../media/default.png' %}";
                 readyText.textContent = 'IA Game';
+                return;
+            }
+
+            if (playerName == opponentName) {
                 return;
             }
 
@@ -253,8 +258,10 @@
             var opponentInput = document.getElementById('opponent-username');
             var opponentName = opponentInput.value.trim();
             var suggestionList = document.getElementById('opponent-suggestions');
+            var readyText = document.getElementById('ready-text');
 
             if (opponentName === '') {
+                readyText.textContent = 'IA Game'; // Change le texte du bouton lorsque la recherche est vide
                 suggestionList.innerHTML = '';
                 return;
             }
@@ -268,7 +275,7 @@
                         suggestionItem.textContent = opponent.username;
                         suggestionItem.addEventListener('click', function() {
                             opponentInput.value = opponent.username;
-                            validateOpponent();
+                            validateOpponent(); // Appel de la fonction validateOpponent pour mettre à jour le bouton
                             suggestionList.innerHTML = '';
                         });
                         suggestionList.appendChild(suggestionItem);
@@ -277,7 +284,7 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-        }  
+        } 
     </script>
 </body>
 {% endblock %}

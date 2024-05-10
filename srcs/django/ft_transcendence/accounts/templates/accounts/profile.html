@@ -178,8 +178,15 @@
 									<img src="{{ usr.profile.image.url }}" alt="Opponent Image" style="width: 100%; height: 100%; border-radius: 50%; {% if match.opponent_score > match.user_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}; margin-left: 10px;">
 								{% endif %}
 							{% endfor %}
+							{% if not match.opponent %}
+							<img src="{% static '../media/ia.gif' %}" alt="Opponent Image" style="width: 30px; height: 30px; border-radius: 50%; {% if match.opponent_score > match.user_score %}border: 3px solid green;{% else %}border: 3px solid red;{% endif %}; margin-left: 10px;">
+							{% endif %}
 						</div>
-						<div>{{ match.opponent | truncatechars:10 }}</div>
+						{% if match.opponent %}
+							<div>{{ match.opponent | truncatechars:10 }}</div>
+						{% else %}
+							<div>IA Game</div>
+						{% endif %}
 					{% endfor %}
 				</div>
 			{% else %}

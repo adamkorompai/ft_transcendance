@@ -60,14 +60,15 @@
 {% block body %}
 <div class="player-info">
     <div class="player">
-        <img src="{{ player1_stats.user.profile.image.url }}" alt="Player 1">
+        <img src="{{ player1_stats.user.profile.image.url }}" alt="Player 1" style="border-radius: 50%;">
         <span>{{ player1_stats.user.username }}</span>
     </div>
     <div class="player">
         {% if player2_stats %}
-        <img src="{{ player2_stats.user.profile.image.url }}" alt="Player 2">
+        <img src="{{ player2_stats.user.profile.image.url }}" alt="Player 2" style="border-radius: 50%;">
         <span>{{ player2_stats.user.username }}</span>
         {% else %}
+        <img src="{% static '../media/ia.gif' %}" alt="Player 2" style="border-radius: 50%;">
         <span>Guest Player</span>
         {% endif %}
     </div>
