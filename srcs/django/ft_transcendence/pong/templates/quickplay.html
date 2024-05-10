@@ -178,34 +178,44 @@
         let opponentValid = false;
 
         function toggleReady(element) {
-            element.classList.toggle('ready-red');
-            element.classList.toggle('ready-green');
-            
-            var allBoxes = document.querySelectorAll('.ready-box');
-            var allGreen = true;
-            
-            allBoxes.forEach(function(box) {
-                if (!box.classList.contains('ready-green') && !box.classList.contains('disabled')) {
-                    allGreen = false;
-                }
-            });
-            
-            if (allGreen) {
-                const player1Username = "{{ request.user.username }}";
-                const player2Username = document.getElementById('opponent-username').value.trim();
-
-                if (player2Username && opponentValid) {
-                    setTimeout(function() {
-                        window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
-                    }, 2000);
+            if (!element.classList.contains('disabled')) {
+                element.classList.toggle('ready-red');
+                element.classList.toggle('ready-green');
+                
+                var allBoxes = document.querySelectorAll('.ready-box');
+                var allGreen = true;
+                
+                allBoxes.forEach(function(box) {
+                    if (!box.classList.contains('ready-green') && !box.classList.contains('disabled')) {
+                        allGreen = false;
+                    }
+                });
+                
+                var opponentInput = document.getElementById('opponent-username');
+                if (element.classList.contains('ready-green')) {
+                    opponentInput.classList.add('disabled');
+                    opponentInput.readOnly = true;
                 } else {
+                    opponentInput.classList.remove('disabled');
+                    opponentInput.readOnly = false;
+                }
+                
+                if (allGreen) {
+                    const player1Username = "{{ request.user.username }}";
+                    const player2Username = opponentInput.value.trim();
+                    
                     setTimeout(function() {
-                        window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
+                        if (player2Username && opponentValid) {
+                            // Si un utilisateur est sélectionné, lancer la version normale du jeu
+                            window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
+                        } else {
+                            // Si aucun utilisateur n'est sélectionné, lancer la version du jeu avec l'IA
+                            window.location.href = "{% url 'pong_ia_game' %}?player1=" + encodeURIComponent(player1Username);
+                        }
                     }, 2000);
                 }
             }
         }
-
         const debounce = (func, delay) => {
             let timeoutId;
             return (...args) => {
@@ -220,17 +230,22 @@
             var opponentInput = document.getElementById('opponent-username');
             var opponentImage = document.getElementById('opponent-image');
             var opponentName = opponentInput.value.trim();
-            var playerName = "{{ request.user.username }}"
+            var playerName = "{{ request.user.username }}";
             var readyBox = document.querySelector('.user-info:last-child .ready-box');
             var readyText = document.getElementById('ready-text');
 
             if (opponentName === '') {
                 opponentImage.src = "{% static '../media/default.png' %}";
                 readyText.textContent = 'IA Game';
+                readyBox.classList.add('disabled');
                 return;
             }
 
             if (playerName == opponentName) {
+                opponentImage.src = "{% static '../media/default.png' %}";
+                opponentValid = false;
+                readyBox.classList.add('disabled');
+                readyText.textContent = 'Invalid Selection';
                 return;
             }
 
@@ -275,7 +290,7 @@
                         suggestionItem.textContent = opponent.username;
                         suggestionItem.addEventListener('click', function() {
                             opponentInput.value = opponent.username;
-                            validateOpponent(); // Appel de la fonction validateOpponent pour mettre à jour le bouton
+                            validateOpponent();
                             suggestionList.innerHTML = '';
                         });
                         suggestionList.appendChild(suggestionItem);

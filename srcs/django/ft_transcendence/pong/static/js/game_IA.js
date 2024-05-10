@@ -161,7 +161,7 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             leftPaddle.score++;
-            if (leftPaddle.score >= 3) {
+            if (leftPaddle.score >= 1) {
                 endGame(player1Username);
             } else {
                 setTimeout(function() {
@@ -175,8 +175,8 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             rightPaddle.score++;
-            if (rightPaddle.score >= 3) {
-                endGame(player2Username);
+            if (rightPaddle.score >= 1) {
+                endGame('Pong GPT');
             } else {
                 setTimeout(function() {
                     resetBall();
@@ -194,21 +194,27 @@ function endGame(winner) {
 
     alert(`Game Over! ${winner} wins!`);
 
+    // console.log('Sending game data:', {
+    //     player: player1Username,
+    //     player_score: leftPaddle.score,
+    //     ia_score: rightPaddle.score,
+    //     time_played: elapsedTime,
+    //     player_nb_defense: leftPaddle.defense,
+    // });
+
     // Save des stats du jeu
-    fetch("/play/save-game-stats/", {
+    fetch('/play/save-ia-game-stats/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken, 
+            'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify({
-            player1: player1Username,
-            player2: player2Username,
-            player1_score: leftPaddle.score,
-            player2_score: rightPaddle.score,
+            player: player1Username,
+            player_score: leftPaddle.score,
+            ia_score: rightPaddle.score,
             time_played: elapsedTime,
-            player1_nb_defense: leftPaddle.defense,
-            player2_nb_defense: rightPaddle.defense,
+            player_nb_defense: leftPaddle.defense,
         }),
     })
     .then(response => {
