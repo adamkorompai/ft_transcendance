@@ -30,6 +30,8 @@ def pong_game(request):
     context = {
         'player1_stats': player1_stats,
         'player2_stats': player2_stats,
+        'player1_username': player1_username,
+        'player2_username': player2_username,
     }
 
     return render(request, 'game.html', context)
@@ -200,7 +202,7 @@ def save_game_stats(request):
         player2_nb_defense = data['player2_nb_defense']
 
         player1 = User.objects.get(username=player1_username)
-        player1_stats = UserStats.objects.get(user=player1)
+        player1_stats, _ = UserStats.objects.get_or_create(user=player1)
 
         player1_stats.total_games += 1
         player1_stats.goals_scored += player1_score
@@ -213,10 +215,9 @@ def save_game_stats(request):
         else:
             player1_stats.losses += 1
 
-        # Créer un dico pour le match du joueurs principale
         match_data = {
             'opponent': player2_username,
-            'player_score': player1_score,
+            'user_score': player1_score,
             'opponent_score': player2_score
         }
         player1_stats.match_history.append(match_data)
@@ -225,7 +226,7 @@ def save_game_stats(request):
 
         if player2_username:
             player2 = User.objects.get(username=player2_username)
-            player2_stats = UserStats.objects.get(user=player2)
+            player2_stats, _ = UserStats.objects.get_or_create(user=player2)
 
             player2_stats.total_games += 1
             player2_stats.goals_scored += player2_score
@@ -238,10 +239,9 @@ def save_game_stats(request):
             else:
                 player2_stats.losses += 1
 
-            # Créer un dico pour le match pour du joueurs adv
             match_data_player2 = {
                 'opponent': player1_username,
-                'player_score': player2_score,
+                'user_score': player2_score,
                 'opponent_score': player1_score
             }
             player2_stats.match_history.append(match_data_player2)
@@ -251,3 +251,20 @@ def save_game_stats(request):
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error'})
+
+def search_opponents(request):
+    query = request.GET.get('query', '')
+    opponents = User.objects.filter(username__istartswith=query)
+    data = [{'username': opponent.username} for opponent in opponents]
+    return JsonResponse(data, safe=False)
+
+def pong_ia_game(request):
+    player_username = request.GET.get('player')
+    player = get_object_or_404(User, username=player_username)
+    player_stats, _ = UserStats.objects.get_or_create(user=player)
+
+    context = {
+        'player_stats': player_stats,
+    }
+
+    return render(request, 'game_ia.html', context)

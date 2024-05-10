@@ -1,3 +1,6 @@
+// debut du chrono
+let elapsedTime = 0;
+
 // Define canvas and context
 const canvas = document.getElementById('pongCanvas');
 const ctx = canvas.getContext('2d');
@@ -18,6 +21,7 @@ let leftPaddle = {
     height: 50,
     dy: 0, // Paddle speed
     score: 0,
+    defense: 0,
 };
 
 let rightPaddle = {
@@ -27,6 +31,7 @@ let rightPaddle = {
     height: 50,
     dy: 0, // Paddle speed
     score: 0,
+    defense: 0,
 };
 
 let goalScored = false; // Variable to track if a goal has been scored
@@ -51,6 +56,16 @@ let zPressed = false;
 let sPressed = false;
 let upPressed = false;
 let downPressed = false;
+
+function startTimer() {
+    gameTimer = setInterval(function() {
+        elapsedTime++;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(gameTimer);
+}
 
 function keyDownHandler(e) {
     if (e.key === 'z') {
@@ -122,16 +137,22 @@ function update() {
         ball.x + ball.dx > rightPaddle.x &&
         ball.x + ball.dx < rightPaddle.x + rightPaddle.width &&
         ball.y > rightPaddle.y &&
-        ball.y < rightPaddle.y + rightPaddle.height
+        ball.y < rightPaddle.y + rightPaddle.height &&
+        ball.x + ball.radius > rightPaddle.x
     ) {
         ball.dx = -ball.dx;
+        ball.dy = (Math.random() - 0.5) * 6;
+        rightPaddle.defense++;
     } else if (
         ball.x + ball.dx < leftPaddle.x + leftPaddle.width &&
         ball.x + ball.dx > leftPaddle.x &&
         ball.y > leftPaddle.y &&
-        ball.y < leftPaddle.y + leftPaddle.height
+        ball.y < leftPaddle.y + leftPaddle.height &&
+        ball.x - ball.radius < leftPaddle.x + leftPaddle.width
     ) {
         ball.dx = -ball.dx;
+        ball.dy = (Math.random() - 0.5) * 6;
+        leftPaddle.defense++;
     }
 
     // Check for scoring (ball past the paddles)
@@ -140,8 +161,8 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             leftPaddle.score++;
-            if (leftPaddle.score >= 7) {
-                endGame('Player 1');
+            if (leftPaddle.score >= 3) {
+                endGame(player1Username);
             } else {
                 setTimeout(function() {
                     resetBall();
@@ -154,8 +175,8 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Set goal scored flag
             rightPaddle.score++;
-            if (rightPaddle.score >= 7) {
-                endGame('Player 2');
+            if (rightPaddle.score >= 3) {
+                endGame(player2Username);
             } else {
                 setTimeout(function() {
                     resetBall();
@@ -168,9 +189,38 @@ function update() {
 
 // Function to end the game
 function endGame(winner) {
+    stopTimer();
     clearInterval(gameLoop);
+
     alert(`Game Over! ${winner} wins!`);
+
+    // Save des stats du jeu
+    fetch("/play/save-game-stats/", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken, 
+        },
+        body: JSON.stringify({
+            player1: player1Username,
+            player2: player2Username,
+            player1_score: leftPaddle.score,
+            player2_score: rightPaddle.score,
+            time_played: elapsedTime,
+            player1_nb_defense: leftPaddle.defense,
+            player2_nb_defense: rightPaddle.defense,
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur lors de la sauvegarde des statistiques du jeu');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
 }
+
 
 function resetBall() {
     ball.x = canvas.width / 2;
@@ -209,21 +259,5 @@ function gameLoop() {
 }
 
 // Start the game loop
-setInterval(gameLoop, 10); // Run the game loop every 10 milliseconds 
-
-//recup et envoyer requete ajax mais a completer!!! et verif le nom de variable avec views.py:
-// fetch("{% url 'save_game_stats' %}", {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//         player1: player1Username,
-//         player2: player2Username,
-//         player1_score: player1Score,
-//         player2_score: player2Score,
-//         time_played: timePlayed,
-//         player1_nb_defense: player1Defense,
-//         player2_nb_defense: player2Defense,
-//     }),
-// })
+startTimer();
+setInterval(gameLoop, 10); // Run the game loop every 10 milliseconds
