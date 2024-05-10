@@ -15,14 +15,17 @@ function sendFriendRequest(id, csrf) {
         data: payload,
         success: function(data) {
             if (data['response'] == "Friend request sent."){
-                onFriendRequestSent(id, csrf)
+                onFriendRequestSent(id, csrf);
+            }
+            else if (data['response'] === 'Friend request accepted while sending mine') {
+                onFriendRequestAccepted('header_status_bar', data);
             }
             else if (data['response'] != null) {
-                alert(data['response']);
+                console.log(data['response']);
             }
         },
         error: function(data) {
-            alert("Something went wrong." + data)
+            alert("Something went wrong. HELLOOO" + data['response']);
         },
     })
 }
@@ -55,14 +58,13 @@ function cancelFriendRequest(id, csrf) {
                 onFriendRequestCanceled()
             }
             else if (data.response != null) {
-                alert(data.response)
+                location.reload()
+                console.log(data['response'])
             }
         },
         error: function(data) {
-            alert("Something went wrong: " + data)
-        },
-        complete: function() {
-            
+            location.reload()
+            // alert("Oupsy! Something went wrong: " + data)
         },
     })
 }
@@ -93,7 +95,7 @@ function acceptFriendRequest(friend_request_id, container) {
                 onFriendRequestAccepted(container, data)
             }
             else if (data.response != null) {
-                alert(data.response)
+                location.reload()
             }
         },
         error: function(data) {
@@ -135,7 +137,7 @@ function declineFriendRequest(friend_request_id, origin) {
                 onFriendRequestDeclined(origin, data['content']);
             }
             else if (data.response != null) {
-                alert(data.response)
+                location.reload()
             }
         },
         error: function(data) {

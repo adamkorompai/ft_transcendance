@@ -321,12 +321,23 @@ def send_friend_request(request) -> HttpResponse:
                     for request in friend_requests:
                         if request.is_active:
                             raise Exception("You already sent them a friend request.")
-                    # if none are active, then create a new friend request
-                    friend_request = FriendRequest(sender=user, receiver=receiver)
-                    friend_request.save()
-                    payload['response'] = "Friend request sent."
+                    # if none are active: two options
+                    # already got invited by him, so accept his request
+                    invitation = FriendRequest.objects.filter(sender=receiver, receiver=user)
+                    was_accepted = False
+                    for invit in invitation:
+                        if invit.is_active:
+                            # accept his request
+                            invit.accept()
+                            payload['response'] = "Friend request accepted while sending mine"
+                            was_accepted = True
+                    if not was_accepted:
+                        # create a new friend request
+                        friend_request = FriendRequest(sender=user, receiver=receiver)
+                        friend_request.save()
+                        payload['response'] = "Friend request sent."
                 except Exception as e:
-                    payload['response'] = str(e)
+                    payload['response'] = "PAssed hereee boyzooo" #str(e)
             except FriendRequest.DoesNotExist:
                 # There are no friend requests so create one
                 friend_request = FriendRequest(sender=user, receiver=receiver)
@@ -349,7 +360,7 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
         if friend_request_id:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
             # confirm that it is addressed to logged in user
-            if friend_request.receiver == user:
+            if friend_request.receiver == user and friend_request.is_active:
                 if friend_request:
                     # found the request. Now accept it
                     friend_request.accept()
@@ -370,6 +381,7 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                 else:
                     payload['response'] = 'Something went wrong'
             else:
+                messages.info(request, "Sorry but the request was cancelled.")
                 payload['response'] = 'That is not your request to accept'
         else:
             payload['response'] = 'Unable to accept that friend request'
@@ -385,7 +397,7 @@ def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
         if friend_request_id:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
             # confirm that it is addressed to logged in user
-            if friend_request.receiver == user:
+            if friend_request.receiver == user and friend_request.is_active:
                 if friend_request:
                     # foudn the request. Now decline it
                     friend_request.decline()
@@ -404,6 +416,7 @@ def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
                 else:
                     payload['response'] = "Somethind went wrong"
             else:
+                messages.info(request, "Sorry but the request was cancelled.")
                 payload['response'] = "That is not your request to decline"
         else:
             payload['response'] = "Unable to decline that friend request"
@@ -426,13 +439,20 @@ def cancel_friend_request(request) -> HttpResponse:
             # There should only every be a single active friend request at any given time.
             # Cancel them all just in case.
             if len(friend_requests) > 1:
+                no_issue = True
                 for req in friend_requests:
-                    request.cancel()
-                payload['response'] = "Friend request cancelled"
+                    if req.is_active:
+                        req.cancel()
+                        no_issue = False
+                payload['response'] = "Friend request cancelled" if no_issue else "Something went wront in the loop. no_issue=False"
             else:
                 # found the request. Now cancel it
-                friend_requests.first().cancel()
-                payload['response'] = "Friend request cancelled"
+                if friend_requests.first().is_active:
+                    friend_requests.first().cancel()
+                    payload['response'] = "Friend request cancelled"
+                else:
+                    messages.info(request, "Sorry but the invitation was already accepted")
+                    payload['response'] = "Friend request is not there anymore"
         else:
             payload['response'] = "Unable to cancel that friend request"
     else:
