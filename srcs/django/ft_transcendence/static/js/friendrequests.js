@@ -15,14 +15,17 @@ function sendFriendRequest(id, csrf) {
         data: payload,
         success: function(data) {
             if (data['response'] == "Friend request sent."){
-                onFriendRequestSent(id, csrf)
+                onFriendRequestSent(id, csrf);
+            }
+            else if (data['response'] === 'Friend request accepted while sending mine') {
+                onFriendRequestAccepted('header_status_bar', data);
             }
             else if (data['response'] != null) {
-                alert(data['response']);
+                console.log(data['response']);
             }
         },
         error: function(data) {
-            alert("Something went wrong." + data)
+            alert("Something went wrong. HELLOOO" + data['response']);
         },
     })
 }
@@ -55,14 +58,13 @@ function cancelFriendRequest(id, csrf) {
                 onFriendRequestCanceled()
             }
             else if (data.response != null) {
-                alert(data.response)
+                location.reload()
+                console.log(data['response'])
             }
         },
         error: function(data) {
-            alert("Something went wrong: " + data)
-        },
-        complete: function() {
-            
+            location.reload()
+            // alert("Oupsy! Something went wrong: " + data)
         },
     })
 }
@@ -93,7 +95,7 @@ function acceptFriendRequest(friend_request_id, container) {
                 onFriendRequestAccepted(container, data)
             }
             else if (data.response != null) {
-                alert(data.response)
+                location.reload()
             }
         },
         error: function(data) {
@@ -135,7 +137,7 @@ function declineFriendRequest(friend_request_id, origin) {
                 onFriendRequestDeclined(origin, data['content']);
             }
             else if (data.response != null) {
-                alert(data.response)
+                location.reload()
             }
         },
         error: function(data) {
@@ -206,7 +208,7 @@ function onFriendRemoved() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function blockUnblock(id, action) {
+function blockUnblock(id, action, fromChat) {
     var url = `/accounts/blocking?user_id=${id}&action=${action}`
     $.ajax({
         type: "GET",
@@ -214,7 +216,7 @@ function blockUnblock(id, action) {
         url: url,
         timaout: 5000,
         success: function(data) {
-            onBlockedUnblocked(action);
+            onBlockedUnblocked(action, fromChat);
         },
         error: function(data) {
             alert(data['response'], 'Error');
@@ -225,13 +227,17 @@ function blockUnblock(id, action) {
     })
 }
 
-function onBlockedUnblocked(action) {
+function onBlockedUnblocked(action, fromChat) {
     var status_bar = document.getElementById("header_status_bar");
     status_bar.innerHTML = ""
     id = status_bar.getAttribute("data-id");
     csrf = status_bar.getAttribute("data-csrf")
 
-    if (action === "block") {
+    if (fromChat === "true") {
+        // redirect to global chat page
+        redirectToPage("/chatapp/");
+    }
+    else if (action === "block") {
         unblock_btn = createBlockUnblockBtn(id, "unblock");
         status_bar.append(unblock_btn);
     } else {
@@ -239,6 +245,11 @@ function onBlockedUnblocked(action) {
         block_btn = createBlockUnblockBtn(id, "block");
         status_bar.append(add_friend_btn, block_btn);
     };
+}
+
+function redirectToPage(url) {
+    const host = window.location.host
+    window.location.href = `${host}${url}`;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

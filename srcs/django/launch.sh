@@ -20,7 +20,7 @@ if [ $? -eq 0 ]; then
 	python3 -m pip install daphne;
 	python3 manage.py makemigrations;
 	python3 manage.py migrate;
-	python3 manage.py runsslserver 0.0.0.0:8000;
+	python3 manage.py runserver 0.0.0.0:8000;
 else
     echo "Échec de la connexion à la base de données PostgreSQL.";
 fi
