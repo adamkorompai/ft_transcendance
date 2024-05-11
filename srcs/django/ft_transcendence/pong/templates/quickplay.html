@@ -207,10 +207,27 @@
                     setTimeout(function() {
                         if (player2Username && opponentValid) {
                             // Si un utilisateur est sélectionné, lancer la version normale du jeu
-                            window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1Username) + "&player2=" + encodeURIComponent(player2Username);
+                            var form = document.createElement('form');
+                            form.action = "{% url 'pong_game' %}";
+                            form.method = 'POST';
+                            form.innerHTML = `
+                                {% csrf_token %}
+                                <input type="hidden" name="player1" value="${player1Username}">
+                                <input type="hidden" name="player2" value="${player2Username}">
+                            `;
+                            document.body.appendChild(form);
+                            form.submit();
                         } else {
                             // Si aucun utilisateur n'est sélectionné, lancer la version du jeu avec l'IA
-                            window.location.href = "{% url 'pong_ia_game' %}?player1=" + encodeURIComponent(player1Username);
+                            var form = document.createElement('form');
+                            form.action = "{% url 'pong_ia_game' %}";
+                            form.method = 'POST';
+                            form.innerHTML = `
+                                {% csrf_token %}
+                                <input type="hidden" name="player1" value="${player1Username}">
+                            `;
+                            document.body.appendChild(form);
+                            form.submit();
                         }
                     }, 2000);
                 }
@@ -299,7 +316,17 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-        } 
+        }
+
+        window.addEventListener('pageshow', function(event) {
+            var opponentInput = document.getElementById('opponent-username');
+            var readyBox = document.querySelector('.user-info:last-child .ready-box');
+            
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                // La page est chargée depuis le cache après un retour en arrière
+                opponentInput.value = '';
+            }
+        });
     </script>
 </body>
 {% endblock %}

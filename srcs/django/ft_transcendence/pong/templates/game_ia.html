@@ -86,9 +86,8 @@
     document.getElementById("restartButton").addEventListener("click", function() {
         const params = new URLSearchParams(window.location.search);
         const player1 = params.get("player1");
-        const player2 = params.get("player2");
         
-        window.location.href = "{% url 'pong_game' %}?player1=" + encodeURIComponent(player1) + "&player2=" + encodeURIComponent(player2);
+        window.location.href = "{% url 'pong_ia_game' %}?player1=" + encodeURIComponent(player1);
     });
 </script>
 {% endblock %}

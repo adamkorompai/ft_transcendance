@@ -15,38 +15,41 @@ import json
 
 # Create your views here.
 def pong_game(request):
-    player1_username = request.GET.get('player1')
-    player2_username = request.GET.get('player2')
-
-    player1 = get_object_or_404(User, username=player1_username)
-    player1_stats, _ = UserStats.objects.get_or_create(user=player1)
-
-    if player2_username:
-        player2 = get_object_or_404(User, username=player2_username)
-        player2_stats, _ = UserStats.objects.get_or_create(user=player2)
-    else:
-        player2_stats = None
-
-    context = {
-        'player1_stats': player1_stats,
-        'player2_stats': player2_stats,
-        'player1_username': player1_username,
-        'player2_username': player2_username,
-    }
-
-    return render(request, 'game.html', context)
+    if request.method == 'POST':
+        player1_username = request.POST.get('player1')
+        player2_username = request.POST.get('player2')
+        
+        player1 = get_object_or_404(User, username=player1_username)
+        player1_stats, _ = UserStats.objects.get_or_create(user=player1)
+        
+        if player2_username:
+            player2 = get_object_or_404(User, username=player2_username)
+            player2_stats, _ = UserStats.objects.get_or_create(user=player2)
+        else:
+            player2_stats = None
+        
+        context = {
+            'player1_stats': player1_stats,
+            'player2_stats': player2_stats,
+            'player1_username': player1_username,
+            'player2_username': player2_username,
+        }
+        
+        return render(request, 'game.html', context)
+    
+    return redirect('play')
 
 def pong_ia_game(request):
-    player1_username = request.GET.get('player1')
-    player1 = get_object_or_404(User, username=player1_username)
-    player1_stats, _ = UserStats.objects.get_or_create(user=player1)
-
-    context = {
-        'player1_stats': player1_stats,
-        'player1_username': player1_username,
-    }
-
-    return render(request, 'game_ia.html', context)
+    if request.method == 'POST':
+        player1_username = request.POST.get('player1')
+        player1 = get_object_or_404(User, username=player1_username)
+        player1_stats, _ = UserStats.objects.get_or_create(user=player1)
+        context = {
+            'player1_stats': player1_stats,
+            'player1_username': player1_username,
+        }
+        return render(request, 'game_ia.html', context)
+    return redirect('play')
 
 def play(request):
     if 'HTTP_HX_REQUEST' in request.META:
@@ -276,12 +279,6 @@ def save_ia_game_stats(request):
         ia_score = data.get('ia_score', 0)
         time_played = data.get('time_played', 0)
         player_nb_defense = data.get('player_nb_defense', 0)
-        
-        print('Player username:', player_username)
-        print('Player score:', player_score)
-        print('IA score:', ia_score)
-        print('Time played:', time_played)
-        print('Player nb defense:', player_nb_defense)
 
         player = User.objects.get(username=player_username)
         player_stats, _ = UserStats.objects.get_or_create(user=player)
