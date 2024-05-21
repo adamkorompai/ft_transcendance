@@ -2,6 +2,7 @@ FROM python:3.9.18-bookworm
 
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install postgresql-client wget unzip -y
+RUN apt-get install curl -y
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir psycopg2-binary \
@@ -26,7 +27,9 @@ RUN pip install --no-cache-dir psycopg2-binary \
 				werkzeug \
 				django-extensions \
 				pyOpenSSL \
-				django-sslserver
+				django-sslserver \
+				# enable prometheus metrics export
+				django-prometheus
 
 COPY ./ft_transcendence /home/django/ft_transcendence
 
