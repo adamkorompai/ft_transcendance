@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('home.urls')),
     path('stats/', include('stats.urls')),
     path('accounts/', include('accounts.urls')),
+    path('', include('django_prometheus.urls')),
 ]
 
 # to access user uploaded images (profile picture)

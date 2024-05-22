@@ -1,12 +1,14 @@
 DOCK_COMP = ./srcs/docker-compose.yml
 
 all: build
-	docker-compose -f $(DOCK_COMP) up -d
 
 build:
+	mkdir -p ./srcs/certificates
 	mkdir -p ./srcs/data/db
-	# chmod 777 ./srcs/data/db
-	docker-compose -f $(DOCK_COMP) up --build
+	mkdir -p ./srcs/data/grafana
+	mkdir -p ./srcs/data/prometheus
+	docker pull grafana/grafana-oss
+	docker-compose -f $(DOCK_COMP) up -d --build
 
 clean:
 	-docker-compose -f $(DOCK_COMP) down -v
@@ -18,6 +20,7 @@ fclean: clean
 
 reset: fclean
 	rm -rf ./srcs/data
+	rm -rf ./srcs/certificates
 	find . -type d -name '__pycache__' -exec rm -r {} +
 	rm -rf ./srcs/django/ft_transcendence/threejs
 
