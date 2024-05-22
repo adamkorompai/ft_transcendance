@@ -288,13 +288,12 @@ def editprofile(request) -> HttpResponse:
 
             base_url = reverse('accounts:profile', kwargs={'username': request.user.username})
             return redirect(f'{base_url}?fromEdit=True')
-        messages.warning(request, 'NOT VALID')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
     context['u_form'] = u_form
     context['p_form'] = p_form
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_HX_REQUEST' in request.META and request.method == 'GET':
         context['request'] = request
         b_body = render_block_to_string('accounts/editprofile.html', 'body', context)
         return HttpResponse(b_body)
