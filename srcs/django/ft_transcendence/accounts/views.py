@@ -288,7 +288,6 @@ def editprofile(request) -> HttpResponse:
 
             base_url = reverse('accounts:profile', kwargs={'username': request.user.username})
             return redirect(f'{base_url}?fromEdit=True')
-        messages.warning(request, 'NOT VALID')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
