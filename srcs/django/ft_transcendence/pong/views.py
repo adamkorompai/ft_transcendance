@@ -37,7 +37,7 @@ def pong_game(request):
         
         return render(request, 'game.html', context)
     
-    return redirect('play')
+    return redirect('quick_play')
 
 def pong_ia_game(request):
     if request.method == 'POST':
@@ -49,7 +49,7 @@ def pong_ia_game(request):
             'player1_username': player1_username,
         }
         return render(request, 'game_ia.html', context)
-    return redirect('play')
+    return redirect('quick_play')
 
 def play(request):
     if 'HTTP_HX_REQUEST' in request.META:
@@ -218,7 +218,6 @@ def save_game_stats(request):
 
         player1 = User.objects.get(username=player1_username)
         player1_stats, _ = UserStats.objects.get_or_create(user=player1)
-
         player1_stats.total_games += 1
         player1_stats.goals_scored += player1_score
         player1_stats.goals_conceded += player2_score
@@ -230,19 +229,23 @@ def save_game_stats(request):
         else:
             player1_stats.losses += 1
 
+        if player2_username:
+            player2 = User.objects.get(username=player2_username)
+            player2_profile_image = player2.profile.image.url
+        else:
+            player2_profile_image = None
+
         match_data = {
             'opponent': player2_username,
             'user_score': player1_score,
-            'opponent_score': player2_score
+            'opponent_score': player2_score,
+            'opponent_profile_image': player2_profile_image
         }
         player1_stats.match_history.append(match_data)
-
         player1_stats.save()
 
         if player2_username:
-            player2 = User.objects.get(username=player2_username)
             player2_stats, _ = UserStats.objects.get_or_create(user=player2)
-
             player2_stats.total_games += 1
             player2_stats.goals_scored += player2_score
             player2_stats.goals_conceded += player1_score
@@ -254,13 +257,15 @@ def save_game_stats(request):
             else:
                 player2_stats.losses += 1
 
+            player1_profile_image = player1.profile.image.url
+
             match_data_player2 = {
                 'opponent': player1_username,
                 'user_score': player2_score,
-                'opponent_score': player1_score
+                'opponent_score': player1_score,
+                'opponent_profile_image': player1_profile_image
             }
             player2_stats.match_history.append(match_data_player2)
-
             player2_stats.save()
 
         return JsonResponse({'status': 'success'})
