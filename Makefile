@@ -8,7 +8,7 @@ build:
 	mkdir -p ./srcs/data/grafana
 	mkdir -p ./srcs/data/prometheus
 	docker pull grafana/grafana-oss
-	docker-compose -f $(DOCK_COMP) up -d --build
+	docker-compose -f $(DOCK_COMP) up --build
 
 clean:
 	-docker-compose -f $(DOCK_COMP) down -v
