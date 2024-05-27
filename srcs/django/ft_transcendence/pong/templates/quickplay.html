@@ -154,7 +154,7 @@
                 <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image" style="border-radius: 50%;">
                 <h2>{{ request.user.username }}</h2>
             </div>
-            <div class="ready-box ready-red" onclick="toggleReady(this)" style="border-radius: 5px;">
+            <div class="ready-box ready-red" id="player1-ready" onclick="toggleReady('player1')" style="border-radius: 5px;">
                 <p>Ready ?</p>
             </div>
         </div>
@@ -165,7 +165,7 @@
                     <input type="text" id="opponent-username" class="username-input" placeholder="Enter Username" oninput="searchOpponents()">
                     <ul id="opponent-suggestions" class="suggestion-list"></ul>
                 </div>
-                <div class="ready-box ready-red" onclick="toggleReady(this)" style="border-radius: 5px;">
+                <div class="ready-box ready-red" id="player2-ready" onclick="toggleReady('player2')" style="border-radius: 5px;">
                     <p><span id="ready-text">IA Game</span></p>
                 </div>
             </div>
@@ -173,66 +173,78 @@
     </div>
 
     <script>
-        var player1ready = false;
-        var player2ready = false;
+        const player1ReadyBox = document.getElementById('player1-ready');
+        const player2ReadyBox = document.getElementById('player2-ready');
+        const opponentInput = document.getElementById('opponent-username');
+        const readyText = document.getElementById('ready-text');
+        const opponentImage = document.getElementById('opponent-image');
+        const suggestionList = document.getElementById('opponent-suggestions');
+    
+        let player1Ready = false;
+        let player2Ready = false;
         let opponentValid = false;
-
-        function toggleReady(element) {
-            if (!element.classList.contains('disabled')) {
-                element.classList.toggle('ready-red');
-                element.classList.toggle('ready-green');
-                
-                var allBoxes = document.querySelectorAll('.ready-box');
-                var allGreen = true;
-                
-                allBoxes.forEach(function(box) {
-                    if (!box.classList.contains('ready-green') && !box.classList.contains('disabled')) {
-                        allGreen = false;
+    
+        function toggleReady(player) {
+            if (player === 'player1') {
+                player1Ready = !player1Ready;
+                player1ReadyBox.classList.toggle('ready-green', player1Ready);
+                player1ReadyBox.classList.toggle('ready-red', !player1Ready);
+                checkGameReady();
+            } else if (player === 'player2') {
+                validateOpponent().then(() => {
+                    if (!player2Ready && opponentInput.value.trim() && !opponentValid) {
+                        return;
                     }
+
+                    player2Ready = !player2Ready;
+                    player2ReadyBox.classList.toggle('ready-green', player2Ready);
+                    player2ReadyBox.classList.toggle('ready-red', !player2Ready);
+                    opponentInput.readOnly = player2Ready;
+
+                    if (!player2Ready) {
+                        opponentValid = false;
+                        validateOpponent();
+                    }
+
+                    checkGameReady();
                 });
-                
-                var opponentInput = document.getElementById('opponent-username');
-                if (element.classList.contains('ready-green')) {
-                    opponentInput.classList.add('disabled');
-                    opponentInput.readOnly = true;
-                } else {
-                    opponentInput.classList.remove('disabled');
-                    opponentInput.readOnly = false;
-                }
-                
-                if (allGreen) {
-                    const player1Username = "{{ request.user.username }}";
-                    const player2Username = opponentInput.value.trim();
-                    
-                    setTimeout(function() {
-                        if (player2Username && opponentValid) {
-                            // Si un utilisateur est sélectionné, lancer la version normale du jeu
-                            var form = document.createElement('form');
-                            form.action = "{% url 'pong_game' %}";
-                            form.method = 'POST';
-                            form.innerHTML = `
-                                {% csrf_token %}
-                                <input type="hidden" name="player1" value="${player1Username}">
-                                <input type="hidden" name="player2" value="${player2Username}">
-                            `;
-                            document.body.appendChild(form);
-                            form.submit();
-                        } else {
-                            // Si aucun utilisateur n'est sélectionné, lancer la version du jeu avec l'IA
-                            var form = document.createElement('form');
-                            form.action = "{% url 'pong_ia_game' %}";
-                            form.method = 'POST';
-                            form.innerHTML = `
-                                {% csrf_token %}
-                                <input type="hidden" name="player1" value="${player1Username}">
-                            `;
-                            document.body.appendChild(form);
-                            form.submit();
-                        }
-                    }, 2000);
-                }
             }
         }
+    
+        async function checkGameReady() {
+            if (player1Ready && player2Ready) {
+                const player1Username = "{{ request.user.username }}";
+                const player2Username = opponentInput.value.trim();
+    
+                setTimeout(() => {
+                    let form;
+                    if (player2Username && opponentValid) {
+                        form = createForm("{% url 'pong_game' %}", {
+                            player1: player1Username,
+                            player2: player2Username
+                        });
+                    } else {
+                        form = createForm("{% url 'pong_ia_game' %}", {
+                            player1: player1Username
+                        });
+                    }
+                    document.body.appendChild(form);
+                    form.submit();
+                }, 2000);
+            }
+        }
+    
+        function createForm(action, inputs) {
+            const form = document.createElement('form');
+            form.action = action;
+            form.method = 'POST';
+            form.innerHTML = `{% csrf_token %}`;
+            for (const name in inputs) {
+                form.innerHTML += `<input type="hidden" name="${name}" value="${inputs[name]}">`;
+            }
+            return form;
+        }
+    
         const debounce = (func, delay) => {
             let timeoutId;
             return (...args) => {
@@ -240,90 +252,81 @@
                 timeoutId = setTimeout(() => func(...args), delay);
             };
         };
-
+    
         const validateOpponentDebounced = debounce(validateOpponent, 500);
-
-        function validateOpponent() {
-            var opponentInput = document.getElementById('opponent-username');
-            var opponentImage = document.getElementById('opponent-image');
-            var opponentName = opponentInput.value.trim();
-            var playerName = "{{ request.user.username }}";
-            var readyBox = document.querySelector('.user-info:last-child .ready-box');
-            var readyText = document.getElementById('ready-text');
-
+    
+        async function validateOpponent() {
+            const opponentName = opponentInput.value.trim();
+            const playerName = "{{ request.user.username }}";
+    
             if (opponentName === '') {
-                opponentImage.src = "{% static '../media/default.png' %}";
-                readyText.textContent = 'IA Game';
-                readyBox.classList.add('disabled');
+                resetOpponentUI();
                 return;
             }
-
-            if (playerName == opponentName) {
+    
+            if (playerName === opponentName) {
                 opponentImage.src = "{% static '../media/default.png' %}";
                 opponentValid = false;
-                readyBox.classList.add('disabled');
+                player2ReadyBox.classList.add('disabled');
                 readyText.textContent = 'Invalid Selection';
                 return;
             }
-
-            fetch('/play/check-user/' + opponentName + '/')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.exists) {
-                        opponentImage.src = data.profile_image;
-                        opponentValid = true;
-                        readyBox.classList.remove('disabled');
+    
+            try {
+                const response = await fetch('/play/check-user/' + opponentName + '/');
+                const data = await response.json();
+                if (data.exists) {
+                    opponentImage.src = data.profile_image;
+                    opponentValid = true;
+                    player2ReadyBox.classList.remove('disabled');
+                    if (!player2Ready) {
                         readyText.textContent = 'Ready ?';
-                    } else {
-                        opponentImage.src = "{% static '../media/default.png' %}";
-                        opponentValid = false;
-                        readyBox.classList.add('disabled');
-                        readyText.textContent = 'IA Game';
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                } else {
+                    resetOpponentUI();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-
-        function searchOpponents() {
-            var opponentInput = document.getElementById('opponent-username');
-            var opponentName = opponentInput.value.trim();
-            var suggestionList = document.getElementById('opponent-suggestions');
-            var readyText = document.getElementById('ready-text');
-
+    
+        function resetOpponentUI() {
+            opponentImage.src = "{% static '../media/default.png' %}";
+            opponentValid = false;
+            player2ReadyBox.classList.add('disabled');
+            readyText.textContent = 'IA Game';
+        }
+    
+        async function searchOpponents() {
+            const opponentName = opponentInput.value.trim();
+    
             if (opponentName === '') {
-                readyText.textContent = 'IA Game'; // Change le texte du bouton lorsque la recherche est vide
+                readyText.textContent = 'IA Game';
                 suggestionList.innerHTML = '';
                 return;
             }
-
-            fetch('/play/search-opponents/?query=' + encodeURIComponent(opponentName))
-                .then(response => response.json())
-                .then(data => {
-                    suggestionList.innerHTML = '';
-                    data.forEach(opponent => {
-                        var suggestionItem = document.createElement('li');
-                        suggestionItem.textContent = opponent.username;
-                        suggestionItem.addEventListener('click', function() {
-                            opponentInput.value = opponent.username;
-                            validateOpponent();
-                            suggestionList.innerHTML = '';
-                        });
-                        suggestionList.appendChild(suggestionItem);
+    
+            try {
+                const response = await fetch('/play/search-opponents/?query=' + encodeURIComponent(opponentName));
+                const data = await response.json();
+                suggestionList.innerHTML = '';
+                data.forEach(opponent => {
+                    const suggestionItem = document.createElement('li');
+                    suggestionItem.textContent = opponent.username;
+                    suggestionItem.addEventListener('click', function() {
+                        opponentInput.value = opponent.username;
+                        validateOpponentDebounced();
+                        suggestionList.innerHTML = '';
                     });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                    suggestionList.appendChild(suggestionItem);
                 });
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-
+    
         window.addEventListener('pageshow', function(event) {
-            var opponentInput = document.getElementById('opponent-username');
-            var readyBox = document.querySelector('.user-info:last-child .ready-box');
-            
             if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                // La page est chargée depuis le cache après un retour en arrière
                 opponentInput.value = '';
             }
         });
