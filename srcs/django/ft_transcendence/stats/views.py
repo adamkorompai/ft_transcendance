@@ -67,6 +67,7 @@ def user_stats(request):
         'top_by_total_games': top_by_total_games,
         'top_by_win_ratio': top_by_win_ratio,
         'request': request,
+        'title': "Statistics"
     }
     if 'HTTP_HX_REQUEST' in request.META:
         html = render_block_to_string('stats/user_stats.html', 'body', context)
