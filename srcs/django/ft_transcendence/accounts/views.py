@@ -44,7 +44,8 @@ def signup_v(request) -> HttpResponse:
     context = {
         'authorize_uri': authorize_uri+FROMSIGNUP,
         'show_alerts': True,
-        'request': request
+        'request': request,
+        'title': "Sign-up"
     }
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -52,6 +53,7 @@ def signup_v(request) -> HttpResponse:
             form.save()
             messages.success(request, f'Your account has been created! You are now able to log in.')
             context['form'] = AuthenticationForm()
+            context['title'] = "Login"
             # must sent whole page otherwise csrf issue
             return render(request, 'accounts/login.html', context)
     else:
@@ -70,7 +72,8 @@ def login_v(request) -> HttpResponse:
     context = {
         'authorize_uri': authorize_uri+FROMLOGIN,
         'show_alerts': True,
-        'request': request
+        'request': request,
+        'title': "Login"
     }
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -79,6 +82,7 @@ def login_v(request) -> HttpResponse:
             user.profile.active = True
             login(request, user)
             context['all_users'] = User.objects.all()
+            context['title'] = "Home"
             return render(request, 'welcome.html', context) # target=app-body
     else: # GET request
         form = AuthenticationForm()
@@ -177,6 +181,7 @@ def profile(request, username: str) -> HttpResponse:
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
         context['blocklist'] = displayed_user.profile.blocklist.all()
+        context['title'] = f"{username.capitalize()} (profile)"
 
         try:
             user_stats = UserStats.objects.get(user=displayed_user)
@@ -267,7 +272,7 @@ def deleteprofile(request, username: str) -> None:
     
     # Delete the user instance
     user_to_delete.delete()
-    return redirect('accounts:login')
+    return redirect('accounts:login', {'title': "Login"})
 
 """
 Settings page for editing user info
@@ -276,6 +281,7 @@ Settings page for editing user info
 def editprofile(request) -> HttpResponse:
     context = {
         'request': request,
+        'title': "Edit Page"
     }
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -288,7 +294,6 @@ def editprofile(request) -> HttpResponse:
 
             base_url = reverse('accounts:profile', kwargs={'username': request.user.username})
             return redirect(f'{base_url}?fromEdit=True')
-        messages.warning(request, 'NOT VALID')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)

@@ -25,37 +25,8 @@
 			hx-push-url="true">
 			<button class="mt-3 px-3 py-2">Start Playing</button>
 		</a>
-
-		<!-- *************************************************************** -->
-		<!--                          LEADERBOARD                            -->
-		<!-- *************************************************************** -->
-		<!-- <section>
-			<h3>Leaderboard</h3>
-		</section>
-		<section class="table_body">
-			<table>
-				<thead>
-					<tr>
-						<th>Rank</th>
-						<th>Player</th>
-						<th>Score</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for user in all_users %}
-						<tr>
-							<td>{{ forloop.counter }}</td>
-							<td>
-								<a class="d-flex align-items-center" href="{% url 'accounts:profile'%}{{user.username}}">
-									<img src="{{ user.profile.image.url }}" alt="user photo">
-									<p>{{ user.username }}</p>
-								</a>
-							</td>
-							<td>{{ user.profile.wins }}</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</section> -->
+		<script>
+			document.title = "{{title}}"
+		</script>
 	</div>
 {% endblock %}

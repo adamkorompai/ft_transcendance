@@ -11,6 +11,7 @@ def welcome(request):
 	context = {
 		"show_alert": True,
 		"all_users": User.objects.all(),
+		'title': "Home"
 	}
 	if 'HTTP_HX_REQUEST' in request.META:
 		html = render_block_to_string('welcome.html', 'body', context)

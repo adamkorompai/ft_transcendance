@@ -53,10 +53,10 @@ def pong_ia_game(request):
 
 def play(request):
     if 'HTTP_HX_REQUEST' in request.META:
-        context = {"request": request}
+        context = {"request": request, 'title': 'Play'}
         html = render_block_to_string('play.html', 'body', context)
         return HttpResponse(html)
-    return render(request, 'play.html')
+    return render(request, 'play.html', {'title': "Play"})
 
 def quick_play(request):
     if 'HTTP_HX_REQUEST' in request.META:

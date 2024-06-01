@@ -71,7 +71,9 @@ Chat
     {% else %}
         <p>You have no friends yet.</p>
     {% endif %}
-
+    <script>
+        document.title = "{{title}}"
+    </script>
 {% endblock %}
 {% block script_body %}
     <script>
