@@ -19,8 +19,12 @@ from django.template.loader import render_to_string
 from render_block import render_block_to_string
 from django.middleware.csrf import get_token
 from stats.models import UserStats
+import logging
+
 
 # get acces to environment variables
+log = logging.getLogger(__name__)
+logging.basicConfig(filename="logs.txt", encoding='utf-8', level=logging.DEBUG)
 load_dotenv()
 
 authorize_uri = "https://api.intra.42.fr/oauth/authorize?\
@@ -163,7 +167,9 @@ Profile view of current user or another one
 """
 @login_required(login_url='/accounts/login/?redirected=true')
 def profile(request, username: str) -> HttpResponse:
+    # print("Friend request send")
     context = {}
+    context['my_csrf'] = get_token(request)
     try:
         displayed_user = User.objects.get(username=username)
     except:
@@ -305,14 +311,16 @@ def editprofile(request) -> HttpResponse:
         return HttpResponse(b_body)
     return render(request, 'accounts/editprofile.html', context)
 
-""""
+"""
 Friend Request System
 """
+@require_POST
 def send_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
     if request.method == 'POST' and user.is_authenticated:
-        user_id = request.POST.get('receiver_user_id')
+        data = json.loads(request.body)
+        user_id = data.get('receiver_user_id')
         if user_id:
             receiver = User.objects.get(pk=user_id)
             try:
@@ -357,11 +365,13 @@ def send_friend_request(request) -> HttpResponse:
         payload['response'] = "You must be authenticated to send a friend request."
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
-def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
+@require_POST
+def accept_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
-    if request.method == "GET" and user.is_authenticated:
-        friend_request_id = kwargs.get("friend_request_id")
+    if request.method == "POST" and user.is_authenticated:
+        data = json.loads(request.body)
+        friend_request_id = data.get('friend_request_id')
         if friend_request_id:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
             # confirm that it is addressed to logged in user
@@ -394,11 +404,13 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
         payload['response'] = 'You must be authenticated to accept a friend request'
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
-def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
+@require_POST
+def decline_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
-    if request.method == "GET" and user.is_authenticated:
-        friend_request_id = kwargs.get("friend_request_id")
+    if request.method == "POST" and user.is_authenticated:
+        data = json.loads(request.body)
+        friend_request_id = data.get('friend_request_id')
         if friend_request_id:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
             # confirm that it is addressed to logged in user
@@ -429,11 +441,13 @@ def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
         payload['response'] = "You must be authenticated to decline a friend request"
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
+@require_POST
 def cancel_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
     if request.method == "POST" and user.is_authenticated:
-        user_id = request.POST.get("receiver_user_id")
+        data = json.loads(request.body)
+        user_id = data.get('receiver_user_id')
         if user_id:
             receiver = User.objects.get(pk=user_id)
             try:
@@ -464,11 +478,13 @@ def cancel_friend_request(request) -> HttpResponse:
             payload['response'] = "You must be authenticated to cancel a friend requests"
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
+@require_POST
 def remove_friend(request) -> HttpResponse:
     user = request.user
     payload = {}
     if request.method == "POST" and user.is_authenticated:
-        user_id = request.POST.get("receiver_user_id")
+        data = json.loads(request.body)
+        user_id = data.get("receiver_user_id")
         if user_id:
             try:
                 removee = User.objects.get(pk=user_id)
@@ -483,14 +499,16 @@ def remove_friend(request) -> HttpResponse:
         payload['response'] = "You must be authenticated to remove a friend"
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
+
 def blocking(request) -> HttpResponse:
     current_user = request.user
     blocklist = current_user.profile.blocklist
-    action = request.GET.get("action")
+    data = json.loads(request.body)
+    action = data.get("action")
     payload = {}
 
     if current_user.is_authenticated:
-        user_id = request.GET.get("user_id")
+        user_id = data.get("user_id")
         if user_id:
             target_user = User.objects.get(pk=user_id)
 
