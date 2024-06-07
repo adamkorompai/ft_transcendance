@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block body %}
+
 <div class="mx-3 mx-md-0">
 	<div class="p-3 __bg-secondary d-flex mb-3 rounded-2">
 		<img class="rounded-circle me-3" src="{{ profile_img }}" width="125px" height="125px" alt="profile picture">
@@ -43,7 +44,8 @@
 								<button
 									onclick="acceptFriendRequest(
 										'{{pending_friend_request_id}}',
-										'header_status_bar'
+										'header_status_bar',
+										{% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%},
 										)"
 									id="id_accept_request"
 									class="btn_requests">
@@ -53,10 +55,11 @@
 								<!--                 IGNORE                  -->
 								<!--//////////////////////////////////////////-->
 								<button
-									onclick='declineFriendRequest(
-										"{{pending_friend_request_id}}",
-										"header_status_bar",
-									)'
+									onclick="declineFriendRequest(
+										'{{pending_friend_request_id}}',
+										'header_status_bar',
+										{% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%},
+									)"
 									id="id_ignore_request"
 									class="btn_requests">
 									Ignore
@@ -88,7 +91,11 @@
 										<!--                UNBLOCK                  -->
 										<!--/////////////////////////////////////////-->
 										<button
-											onclick='blockUnblock("{{ id }}", "unblock", "false")' 
+											onclick="blockUnblock(
+												'{{ id }}',
+												'unblock',
+												'false',
+											)" 
 											class="btn_requests">
 											Unblock
 										</button>
@@ -107,7 +114,11 @@
 										<!--               BLOCK                 -->
 										<!--/////////////////////////////////////-->
 										<button
-											onclick='blockUnblock("{{ id }}", "block", "false")' 
+										onclick="blockUnblock(
+												'{{ id }}',
+												'block',
+												'false',
+											)" 
 											class="btn_requests">
 											Block
 										</button>
@@ -140,7 +151,11 @@
 								<!--                   BLOCK                     -->
 								<!--/////////////////////////////////////////////-->
 								<button 
-									onclick='blockUnblock("{{ id }}", "block", "false")' 
+								onclick="blockUnblock(
+										'{{ id }}',
+										'block',
+										'false',
+									)"  
 									class="btn_requests" 
 									id="id_block_btn">
 									Block
@@ -248,7 +263,7 @@
 			<!--/////////////////////////////////////////////-->
 			<!--               FRIEND REQUEST                -->
 			<!--/////////////////////////////////////////////-->
-			{% if request.user.is_authenticated and is_self == True%}
+			{% if request.user.is_authenticated and is_self == True %}
 				<h5 class="mt-2">Friend Requests</h5>
 				<div
 					data-id="{{id}}"
@@ -276,15 +291,17 @@
 								onclick="acceptFriendRequest(
 									'{{request.id}}',
 									'profile_widget',
+									{% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%}
 								)"
 								class="btn_requests">
 								Confirm
 							</button>
 							<button 
-								onclick='declineFriendRequest(
-									"{{request.id}}",
-									"profile_widget",
-								)' 
+								onclick="declineFriendRequest(
+									'{{request.id}}',
+									'profile_widget',
+									{% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%}
+								)" 
 								class="btn_discrete btn_passive">
 								Ignore
 							</button>
