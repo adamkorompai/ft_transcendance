@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from accounts.models import Profile
 from render_block import render_block_to_string
 from django.middleware.csrf import get_token
+import json
 
 # Create your views here.
 @login_required
@@ -31,9 +32,9 @@ def chat_page(request):
         'my_csrf': get_token(request),
         'title': "Chat"
     }
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         html = render_block_to_string('chat.html', 'body', context)
-        return HttpResponse(html)
+        return HttpResponse(json.dumps({"html": html}), content_type="application/json")
     return render(request, "chat.html", context)
 
 def room(request, slug):

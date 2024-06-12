@@ -247,14 +247,15 @@ def profile(request, username: str) -> HttpResponse:
 
     context['show_alerts'] = True
 
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         if request.GET.get('fromEdit', 'False') == 'True':
             return render(request, 'accounts/profile.html', context)
         context['request'] = request
         context['my_csrf'] = get_token(request)
         b_body = render_block_to_string('accounts/profile.html', 'body', context)
         b_script = render_block_to_string('accounts/profile.html', 'script_body', context)
-        return HttpResponse(b_body + b_script)
+        html = b_body + b_script
+        return HttpResponse(json.dumps({"html": html}), content_type="application/json")
     
     context['request'] = request
     context['my_csrf'] = get_token(request)

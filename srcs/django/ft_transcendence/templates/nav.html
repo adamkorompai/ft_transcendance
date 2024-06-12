@@ -31,7 +31,12 @@
             <ul class="navbar-nav" alt="logo">
                 {% if request.user.is_superuser %}
                 <li>
-                    <a  class="nav-link nav_links text-light" href="/admin/" hx-target="#app-root">Admin</a>
+                    <a
+                        class="nav-link nav_links text-light"
+                        href="/admin/"
+                        hx-target="#app-root"
+                    >
+                    Admin</a>
                 </li>
                 {% endif %}
                 <li class="nav-item active">
