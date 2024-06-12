@@ -614,25 +614,25 @@ body {
     padding: 0;
 }
 
-.container {
-    display: flex;
-    height: 50vh;
-    justify-content: space-between;
-}
-
-.box {
+.box-qp {
     width: 40%; /* Adjust the width as needed */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 80%; /* Adjust the height as needed */
-    border: 2px solid #000;
+    border: 2px solid #1C1A24;
     box-sizing: border-box;
-    margin: 0 5%; /* Adjust the margin to add space between boxes */
+    /* margin: 0 5%; */
     position: relative;
+    flex: 0 0 45%;
+    height: 280px;
+    background-color: #7011F4;
+    border-radius: 10px;
 }
 
+.button {
+    margin-top: 20px;
+}
 .box:nth-child(1) {
     background-color: #7011F4;
 }
@@ -648,26 +648,16 @@ body {
 }
 
 h2 {
-    font-size: 30px; /* Adjust the font size as needed */
-    margin: 5px 0; /* Adjust the margin as needed */
+    font-size: 30px;
+    margin: 5px 0;
 }
 
-.user-image {
-    margin-bottom: 10px; /* Ensure spacing between the image and the username */
-    border-radius: 5px; /* Optional: Adds rounded corners to the image */
-    width: 80px; /* Adjust based on your preference */
-    height: 80px; /* Adjust based on your preference */
-    object-fit: cover; /* Ensures the image covers the area, useful for non-square images */
-}
-
-.username-input {
-    width: 80%; /* Adjust the width of the input field as needed */
-    padding: 10px;
-    margin-top: 10px;
+.user-image-qp {
+    margin-bottom: 10px;
     border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    font-size: 16px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
 }
 
 .ready-box {
@@ -692,6 +682,52 @@ h2 {
 
 .ready-green {
     background-color: #00ff00;
+}
+
+.suggestion-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    border-top: none;
+    border: none;
+    box-sizing: border-box;
+    position: absolute;
+    top: calc(100% - 11px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    background-color: #413d53;
+    z-index: 1;
+    border-top: none;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.suggestion-list li {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.suggestion-list li:hover {
+    background-color: #1900ff;
+}
+
+.opponent-input-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+.username-input {
+    width: 80%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
 }
 
 /* CHAT */
@@ -740,4 +776,79 @@ h2 {
 }
 .table tbody tr {
     border-bottom: none;
+}
+
+
+/* play */
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+.box-play {
+    flex: 0 0 45%;
+    height: 280px;
+    background-color: #7011F4;
+    border: 2px solid #1C1A24;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* h2 {
+    margin: 10px 0;
+  }
+
+  .button {
+    margin-top: 20px;
+  } */
+
+  /* game */
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 400px);
+}
+
+canvas {
+    border: 2px solid #1C1A24;
+    border-radius: 10px;
+}
+
+.pong-canvas {
+    background-color: blue;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+.player span {
+    text-align: center;
+}
+
+.restart-button {
+    /* display: none; */
+    margin-top: 20px;
 }
