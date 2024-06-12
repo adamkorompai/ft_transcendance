@@ -29,6 +29,7 @@ def chat_page(request):
         "friends" : friends,
         "request": request,
         'my_csrf': get_token(request),
+        'title': "Chat"
     }
     if 'HTTP_HX_REQUEST' in request.META:
         html = render_block_to_string('chat.html', 'body', context)

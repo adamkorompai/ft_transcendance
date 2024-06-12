@@ -19,8 +19,12 @@ from django.template.loader import render_to_string
 from render_block import render_block_to_string
 from django.middleware.csrf import get_token
 from stats.models import UserStats
+import logging
+
 
 # get acces to environment variables
+log = logging.getLogger(__name__)
+logging.basicConfig(filename="logs.txt", encoding='utf-8', level=logging.DEBUG)
 load_dotenv()
 
 authorize_uri = "https://api.intra.42.fr/oauth/authorize?\
@@ -44,7 +48,8 @@ def signup_v(request) -> HttpResponse:
     context = {
         'authorize_uri': authorize_uri+FROMSIGNUP,
         'show_alerts': True,
-        'request': request
+        'request': request,
+        'title': "Sign-up"
     }
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -52,6 +57,7 @@ def signup_v(request) -> HttpResponse:
             form.save()
             messages.success(request, f'Your account has been created! You are now able to log in.')
             context['form'] = AuthenticationForm()
+            context['title'] = "Login"
             # must sent whole page otherwise csrf issue
             return render(request, 'accounts/login.html', context)
     else:
@@ -70,7 +76,8 @@ def login_v(request) -> HttpResponse:
     context = {
         'authorize_uri': authorize_uri+FROMLOGIN,
         'show_alerts': True,
-        'request': request
+        'request': request,
+        'title': "Login"
     }
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -79,6 +86,7 @@ def login_v(request) -> HttpResponse:
             user.profile.active = True
             login(request, user)
             context['all_users'] = User.objects.all()
+            context['title'] = "Home"
             return render(request, 'welcome.html', context) # target=app-body
     else: # GET request
         form = AuthenticationForm()
@@ -159,7 +167,9 @@ Profile view of current user or another one
 """
 @login_required(login_url='/accounts/login/?redirected=true')
 def profile(request, username: str) -> HttpResponse:
+    # print("Friend request send")
     context = {}
+    context['my_csrf'] = get_token(request)
     try:
         displayed_user = User.objects.get(username=username)
     except:
@@ -177,6 +187,7 @@ def profile(request, username: str) -> HttpResponse:
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
         context['blocklist'] = displayed_user.profile.blocklist.all()
+        context['title'] = f"{username.capitalize()} (profile)"
 
         try:
             user_stats = UserStats.objects.get(user=displayed_user)
@@ -267,7 +278,7 @@ def deleteprofile(request, username: str) -> None:
     
     # Delete the user instance
     user_to_delete.delete()
-    return redirect('accounts:login')
+    return redirect('accounts:login', {'title': "Login"})
 
 """
 Settings page for editing user info
@@ -276,6 +287,7 @@ Settings page for editing user info
 def editprofile(request) -> HttpResponse:
     context = {
         'request': request,
+        'title': "Edit Page"
     }
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -288,7 +300,6 @@ def editprofile(request) -> HttpResponse:
 
             base_url = reverse('accounts:profile', kwargs={'username': request.user.username})
             return redirect(f'{base_url}?fromEdit=True')
-        messages.warning(request, 'NOT VALID')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
@@ -300,14 +311,16 @@ def editprofile(request) -> HttpResponse:
         return HttpResponse(b_body)
     return render(request, 'accounts/editprofile.html', context)
 
-""""
+"""
 Friend Request System
 """
+@require_POST
 def send_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
     if request.method == 'POST' and user.is_authenticated:
-        user_id = request.POST.get('receiver_user_id')
+        data = json.loads(request.body)
+        user_id = data.get('receiver_user_id')
         if user_id:
             receiver = User.objects.get(pk=user_id)
             try:
@@ -321,12 +334,23 @@ def send_friend_request(request) -> HttpResponse:
                     for request in friend_requests:
                         if request.is_active:
                             raise Exception("You already sent them a friend request.")
-                    # if none are active, then create a new friend request
-                    friend_request = FriendRequest(sender=user, receiver=receiver)
-                    friend_request.save()
-                    payload['response'] = "Friend request sent."
+                    # if none are active: two options
+                    # already got invited by him, so accept his request
+                    invitation = FriendRequest.objects.filter(sender=receiver, receiver=user)
+                    was_accepted = False
+                    for invit in invitation:
+                        if invit.is_active:
+                            # accept his request
+                            invit.accept()
+                            payload['response'] = "Friend request accepted while sending mine"
+                            was_accepted = True
+                    if not was_accepted:
+                        # create a new friend request
+                        friend_request = FriendRequest(sender=user, receiver=receiver)
+                        friend_request.save()
+                        payload['response'] = "Friend request sent."
                 except Exception as e:
-                    payload['response'] = str(e)
+                    payload['response'] = "PAssed hereee boyzooo" #str(e)
             except FriendRequest.DoesNotExist:
                 # There are no friend requests so create one
                 friend_request = FriendRequest(sender=user, receiver=receiver)
@@ -341,15 +365,17 @@ def send_friend_request(request) -> HttpResponse:
         payload['response'] = "You must be authenticated to send a friend request."
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
-def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
+@require_POST
+def accept_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
-    if request.method == "GET" and user.is_authenticated:
-        friend_request_id = kwargs.get("friend_request_id")
+    if request.method == "POST" and user.is_authenticated:
+        data = json.loads(request.body)
+        friend_request_id = data.get('friend_request_id')
         if friend_request_id:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
             # confirm that it is addressed to logged in user
-            if friend_request.receiver == user:
+            if friend_request.receiver == user and friend_request.is_active:
                 if friend_request:
                     # found the request. Now accept it
                     friend_request.accept()
@@ -364,11 +390,13 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
                         'all_users': User.objects.all(),
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
+                        'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:
                     payload['response'] = 'Something went wrong'
             else:
+                messages.info(request, "Sorry but the request was cancelled.")
                 payload['response'] = 'That is not your request to accept'
         else:
             payload['response'] = 'Unable to accept that friend request'
@@ -376,15 +404,17 @@ def accept_friend_request(request, *args, **kwargs) -> HttpResponse:
         payload['response'] = 'You must be authenticated to accept a friend request'
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
-def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
+@require_POST
+def decline_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
-    if request.method == "GET" and user.is_authenticated:
-        friend_request_id = kwargs.get("friend_request_id")
+    if request.method == "POST" and user.is_authenticated:
+        data = json.loads(request.body)
+        friend_request_id = data.get('friend_request_id')
         if friend_request_id:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
             # confirm that it is addressed to logged in user
-            if friend_request.receiver == user:
+            if friend_request.receiver == user and friend_request.is_active:
                 if friend_request:
                     # foudn the request. Now decline it
                     friend_request.decline()
@@ -396,12 +426,14 @@ def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
                         'all_users': User.objects.all(),
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
+                        'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                     payload['response'] = "Friend request declined"
                 else:
                     payload['response'] = "Somethind went wrong"
             else:
+                messages.info(request, "Sorry but the request was cancelled.")
                 payload['response'] = "That is not your request to decline"
         else:
             payload['response'] = "Unable to decline that friend request"
@@ -409,11 +441,13 @@ def decline_friend_request(request, *args, **kwargs) -> HttpResponse:
         payload['response'] = "You must be authenticated to decline a friend request"
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
+@require_POST
 def cancel_friend_request(request) -> HttpResponse:
     user = request.user
     payload = {}
     if request.method == "POST" and user.is_authenticated:
-        user_id = request.POST.get("receiver_user_id")
+        data = json.loads(request.body)
+        user_id = data.get('receiver_user_id')
         if user_id:
             receiver = User.objects.get(pk=user_id)
             try:
@@ -424,24 +458,33 @@ def cancel_friend_request(request) -> HttpResponse:
             # There should only every be a single active friend request at any given time.
             # Cancel them all just in case.
             if len(friend_requests) > 1:
+                no_issue = True
                 for req in friend_requests:
-                    request.cancel()
-                payload['response'] = "Friend request cancelled"
+                    if req.is_active:
+                        req.cancel()
+                        no_issue = False
+                payload['response'] = "Friend request cancelled" if no_issue else "Something went wront in the loop. no_issue=False"
             else:
                 # found the request. Now cancel it
-                friend_requests.first().cancel()
-                payload['response'] = "Friend request cancelled"
+                if friend_requests.first().is_active:
+                    friend_requests.first().cancel()
+                    payload['response'] = "Friend request cancelled"
+                else:
+                    messages.info(request, "Sorry but the invitation was already accepted")
+                    payload['response'] = "Friend request is not there anymore"
         else:
             payload['response'] = "Unable to cancel that friend request"
     else:
             payload['response'] = "You must be authenticated to cancel a friend requests"
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
+@require_POST
 def remove_friend(request) -> HttpResponse:
     user = request.user
     payload = {}
     if request.method == "POST" and user.is_authenticated:
-        user_id = request.POST.get("receiver_user_id")
+        data = json.loads(request.body)
+        user_id = data.get("receiver_user_id")
         if user_id:
             try:
                 removee = User.objects.get(pk=user_id)
@@ -456,14 +499,16 @@ def remove_friend(request) -> HttpResponse:
         payload['response'] = "You must be authenticated to remove a friend"
     return HttpResponse(json.dumps(payload), content_type="application/json")
 
+
 def blocking(request) -> HttpResponse:
     current_user = request.user
     blocklist = current_user.profile.blocklist
-    action = request.GET.get("action")
+    data = json.loads(request.body)
+    action = data.get("action")
     payload = {}
 
     if current_user.is_authenticated:
-        user_id = request.GET.get("user_id")
+        user_id = data.get("user_id")
         if user_id:
             target_user = User.objects.get(pk=user_id)
 

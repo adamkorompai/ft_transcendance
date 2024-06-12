@@ -2,29 +2,35 @@
 //                           FRIEND SYSTEM                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
-function sendFriendRequest(id, csrf) {
+async function sendFriendRequest(id, csrf) {
     payload = {
-        "csrfmiddlewaretoken": csrf,
         "receiver_user_id": id,
     }
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        url: "/accounts/friend_request/",
-        timeout: 5000,
-        data: payload,
-        success: function(data) {
-            if (data['response'] == "Friend request sent."){
-                onFriendRequestSent(id, csrf)
-            }
-            else if (data['response'] != null) {
-                alert(data['response']);
-            }
+    const r = await fetch("/accounts/friend_request/", {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
         },
-        error: function(data) {
-            alert("Something went wrong." + data)
-        },
+        body: JSON.stringify(payload)
     })
+    if (r.ok === true) {
+        r.json().then(body => {
+            res = body['response'];
+            if (res == "Friend request sent.") {
+                onFriendRequestSent(id, csrf);
+            }
+            else if (res === 'Friend request accepted while sending mine') {
+                onFriendRequestAccepted('header_status_bar', data);
+            }
+            else if (res != null) {
+                console.log(data['response']);
+            }
+        })
+        return
+    }
+    throw new Error('Could not SEND friend request.')
 }
 
 function onFriendRequestSent(id, csrf) {
@@ -38,33 +44,33 @@ function onFriendRequestSent(id, csrf) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function cancelFriendRequest(id, csrf) {
-
+async function cancelFriendRequest(id, csrf) {
     payload = {
-        "csrfmiddlewaretoken": csrf,
         "receiver_user_id": id,
     }
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        url: "/accounts/cancel_friend_request/",
-        data: payload,
-        timaout: 5000,
-        success: function(data) {
-            if (data['response'] == "Friend request cancelled") {
+    const r = await fetch("/accounts/cancel_friend_request/", {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
+        },
+        body: JSON.stringify(payload)
+    })
+    if (r.ok === true) {
+        r.json().then(body => {
+            res = body['response'];
+            if (res == "Friend request cancelled") {
                 onFriendRequestCanceled()
             }
-            else if (data.response != null) {
-                alert(data.response)
+            else if (res != null) {
+                location.reload()
+                console.log(res)
             }
-        },
-        error: function(data) {
-            alert("Something went wrong: " + data)
-        },
-        complete: function() {
-            
-        },
-    })
+        })
+        return
+    }
+    throw new Error('Could not CANCEL friend request.')
 }
 
 function onFriendRequestCanceled() {
@@ -81,28 +87,33 @@ function onFriendRequestCanceled() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function acceptFriendRequest(friend_request_id, container) {
-    var url = "/accounts/accept_friend_request/" + friend_request_id
-    $.ajax({
-        type: "GET",
-        dataType: "json",
-        url: url,
-        timaout: 5000,
-        success: function(data) {
-            if (data['response'] == "Friend request accepted") {
-                onFriendRequestAccepted(container, data)
-            }
-            else if (data.response != null) {
-                alert(data.response)
-            }
+async function acceptFriendRequest(friend_request_id, container, csrf) {
+    var url = "/accounts/accept_friend_request/"
+    payload = {
+        "friend_request_id": friend_request_id,
+    }
+    const r = await fetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
         },
-        error: function(data) {
-            alert("Something went wrong: " + data)
-        },
-        complete: function() {
-            
-        },
+        body: JSON.stringify(payload)
     })
+    if (r.ok === true) {
+        r.json().then(body => {
+            res = body['response'];
+            if (res == "Friend request accepted") {
+                onFriendRequestAccepted(container, body['content'])
+            }
+            else if (res != null) {
+                location.reload()
+            }
+        })
+        return
+    }
+    throw new Error('Could not ACCEPT friend request.')
 }
 
 function onFriendRequestAccepted(origin, data) {
@@ -117,34 +128,39 @@ function onFriendRequestAccepted(origin, data) {
         var block_btn = createBlockUnblockBtn(id, "block");
         container.append(unfriend_btn, dm_btn, block_btn);
     } else { // widget_status_bar
-        container.innerHTML = data['content']
+        container.innerHTML = data
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function declineFriendRequest(friend_request_id, origin) {
-    var url = `/accounts/decline_friend_request/${friend_request_id}`;
-    $.ajax({
-        type: "GET",
-        dataType: "json",
-        url: url,
-        timaout: 5000,
-        success: function(data) {
-            if (data['response'] == "Friend request declined") {
-                onFriendRequestDeclined(origin, data['content']);
-            }
-            else if (data.response != null) {
-                alert(data.response)
-            }
+async function declineFriendRequest(friend_request_id, origin, csrf) {
+    var url = "/accounts/decline_friend_request/"
+    payload = {
+        "friend_request_id": friend_request_id,
+    }
+    const r = await fetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
         },
-        error: function(data) {
-            alert("Something went wrong: " + data)
-        },
-        complete: function(data) {
-            
-        },
+        body: JSON.stringify(payload)
     })
+    if (r.ok === true) {
+        r.json().then(body => {
+            res = body['response']
+            if (res == "Friend request declined") {
+                onFriendRequestDeclined(origin, body['content']);
+            }
+            else if (res != null) {
+                location.reload()
+            }
+        })
+        return
+    }
+    throw new Error('Could not DECLINE friend request.')
 }
 
 function onFriendRequestDeclined(origin, response_content) {
@@ -164,32 +180,34 @@ function onFriendRequestDeclined(origin, response_content) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function removeFriend(id, csrf) {
+async function removeFriend(receiver_user_id, csrf) {
+    var url = "/accounts/friend_remove/"
     payload = {
         "csrfmiddlewaretoken": csrf,
-        "receiver_user_id": id,
+        "receiver_user_id": receiver_user_id,
     }
-    $.ajax({
-        type: "POST",
-        dataType: "json",
-        url: "/accounts/friend_remove/",
-        timeout: 5000,
-        data: payload,
-        success: function(data) {
-            if (data['response'] == "Successfully removed that friend"){
+    const r = await fetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
+        },
+        body: JSON.stringify(payload)
+    })
+    if (r.ok === true) {
+        r.json().then(body => {
+            res = body['response']
+            if (res == "Successfully removed that friend"){
                 onFriendRemoved()
             }
-            else if (data['response'] != null) {
-                alert(data['response']);
+            else if (res != null) {
+                throw new Error(res)
             }
-        },
-        error: function(data) {
-            alert("Something went wrong." + data)
-        },
-        complete: function(data) {
-            
-        }
-    })
+        })
+        return
+    }
+    throw new Error('Could not REMOVE from friends.')
 }
 
 function onFriendRemoved() {
@@ -206,32 +224,44 @@ function onFriendRemoved() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function blockUnblock(id, action) {
-    var url = `/accounts/blocking?user_id=${id}&action=${action}`
-    $.ajax({
-        type: "GET",
-        dataType: "json",
-        url: url,
-        timaout: 5000,
-        success: function(data) {
-            onBlockedUnblocked(action);
+async function blockUnblock(id, action, fromChat) {
+    var status_bar = document.getElementById("header_status_bar");
+    csrf = status_bar.getAttribute("data-csrf")
+    var url = "/accounts/blocking/"
+    payload = {
+        "user_id": id,
+        "action": action
+    }
+    console.log(csrf)
+    const r = await fetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf
         },
-        error: function(data) {
-            alert(data['response'], 'Error');
-        },
-        complete: function(data) {
-            
-        },
+        body: JSON.stringify(payload)
     })
+    if (r.ok === true) {
+        r.json().then(body => {
+            onBlockedUnblocked(action, fromChat, csrf);
+        })
+        return
+    }
+    throw new Error('Could not block user.')
 }
 
-function onBlockedUnblocked(action) {
+function onBlockedUnblocked(action, fromChat) {
     var status_bar = document.getElementById("header_status_bar");
     status_bar.innerHTML = ""
     id = status_bar.getAttribute("data-id");
     csrf = status_bar.getAttribute("data-csrf")
 
-    if (action === "block") {
+    if (fromChat === "true") {
+        // redirect to global chat page
+        redirectToPage("/chatapp/");
+    }
+    else if (action === "block") {
         unblock_btn = createBlockUnblockBtn(id, "unblock");
         status_bar.append(unblock_btn);
     } else {
@@ -239,6 +269,11 @@ function onBlockedUnblocked(action) {
         block_btn = createBlockUnblockBtn(id, "block");
         status_bar.append(add_friend_btn, block_btn);
     };
+}
+
+function redirectToPage(url) {
+    const host = window.location.host
+    window.location.href = `${host}${url}`;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

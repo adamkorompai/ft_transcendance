@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    FT_TRANSCENDENCE
+    Login
 {% endblock %}
 
 {% block body %}
@@ -36,5 +36,6 @@
             var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             event.detail.headers['X-CSRFToken'] = csrfToken;
         });
+	    document.title = "{{title}}"
     </script>
 {% endblock %}
