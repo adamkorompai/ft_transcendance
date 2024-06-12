@@ -4,163 +4,22 @@
 {% block title %}
     Quickplay
 {% endblock %}
-{% block styles %}
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
-
-    .container {
-        display: flex;
-        height: 35vh;
-        justify-content: space-between;
-    }
-    .container {
-        display: flex;
-        justify-content: space-between;
-        margin: 20px;
-    }
-    .box {
-        flex: 0 0 45%;
-        height: 280px;
-        background-color: #7011F4;
-        border: 2px solid #1C1A24;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    h2 {
-        margin: 10px 0;
-    }
-    .button {
-        margin-top: 20px;
-    }
-    .box:nth-child(1) {
-        background-color: #7011F4;
-    }
-
-    .box:nth-child(2) {
-        background-color: #7011F4;
-    }
-
-    .user-info {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    h2 {
-        font-size: 30px; /* Adjust the font size as needed */
-        margin: 5px 0; /* Adjust the margin as needed */
-    }
-
-    .user-image {
-        margin-bottom: 10px; /* Ensure spacing between the image and the username */
-        border-radius: 5px; /* Optional: Adds rounded corners to the image */
-        width: 80px; /* Adjust based on your preference */
-        height: 80px; /* Adjust based on your preference */
-        object-fit: cover; /* Ensures the image covers the area, useful for non-square images */
-    }
-
-    .username-input {
-        width: 80%; /* Adjust the width of the input field as needed */
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        font-size: 16px;
-    }
-
-    .ready-box {
-        position: absolute;
-        bottom: 10px;
-        width: calc(100% - 20px);
-        text-align: center;
-        cursor: pointer;
-    }
-
-    .ready-box p {
-        margin: 0;
-        padding: 10px;
-        border-radius: 5px;
-        color: #fff;
-        font-weight: bold;
-    }
-
-    .ready-red {
-        background-color: #ff0000;
-    }
-
-    .ready-green {
-        background-color: #00ff00;
-    }
-    .suggestion-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-        max-height: 400px;
-        overflow-y: auto;
-        border-top: none;
-        border: none;
-        box-sizing: border-box;
-        position: absolute;
-        top: calc(100% - 11px);
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        background-color: #413d53;
-        z-index: 1;
-        border-top: none;
-        border-radius: 5px 5px 5px 5px;
-
-    }
-
-    .suggestion-list li {
-        padding: 5px;
-        cursor: pointer;
-    }
-
-    .suggestion-list li:hover {
-        background-color: #1900ff;
-    }
-    .opponent-input-container {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-        text-align: center;
-    }
-
-    .username-input {
-        width: 80%;
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        font-size: 16px;
-    }
-</style>
-{% endblock %}
 
 {% block body %}
 <body>
     <div class="container">
-        <div class="box" style="border-radius: 10px;">
+        <div class="box-qp" style="border-radius: 10px;">
             <div class="user-info">
-                <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image" style="border-radius: 50%;">
+                <img src="{{ request.user.profile.image.url }}" alt="User Image" class="user-image-qp" style="border-radius: 50%;">
                 <h2>{{ request.user.username }}</h2>
             </div>
             <div class="ready-box ready-red" id="player1-ready" onclick="toggleReady('player1')" style="border-radius: 5px;">
                 <p>Ready ?</p>
             </div>
         </div>
-        <div class="box" style="border-radius: 10px;">
+        <div class="box-qp" style="border-radius: 10px;">
             <div class="user-info">
-                <img id="opponent-image" src="{% static '../media/default.png' %}" alt="Opponent Image" class="user-image" style="border-radius: 50%;">
+                <img id="opponent-image" src="{% static '../media/default.png' %}" alt="Opponent Image" class="user-image-qp" style="border-radius: 50%;">
                 <div class="opponent-input-container">
                     <input type="text" id="opponent-username" class="username-input" placeholder="Enter Username" oninput="searchOpponents()">
                     <ul id="opponent-suggestions" class="suggestion-list"></ul>
