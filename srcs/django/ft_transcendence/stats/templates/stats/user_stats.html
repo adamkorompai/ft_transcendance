@@ -34,11 +34,13 @@
                 </thead>
                 <tbody>
                     {% for user in top_by_wins|slice:":3" %}
-                    <tr class="bg-white">
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user.user.username }}</td>
-                        <td>{{ user.wins }}</td>
-                    </tr>
+                        {% if user.wins != 0 %}
+                            <tr class="bg-white">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ user.user.username }}</td>
+                                <td>{{ user.wins }}</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -55,11 +57,13 @@
                 </thead>
                 <tbody>
                     {% for user in top_by_total_games|slice:":3" %}
-                    <tr class="bg-white">
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user.user.username }}</td>
-                        <td>{{ user.total_games }}</td>
-                    </tr>
+                        {% if user.total_games != 0 %}
+                            <tr class="bg-white">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ user.user.username }}</td>
+                                <td>{{ user.total_games }}</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -76,11 +80,11 @@
                 </thead>
                 <tbody>
                     {% for user in top_by_win_ratio|slice:":3" %}
-                    <tr class="bg-white">
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user.user.username }}</td>
-                        <td>{{ user.win_ratio }}%</td>
-                    </tr>
+                        <tr class="bg-white">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.user.username }}</td>
+                            <td>{{ user.win_ratio }}%</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
