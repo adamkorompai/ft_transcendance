@@ -23,51 +23,20 @@ function generateRoom(userId) {
 //                       Single Page Application                              //
 ////////////////////////////////////////////////////////////////////////////////
 
-const root = document.getElementById("app-root")
-const body = document.getElementById("app-body")
+// adds event listeners to all naviguation links
+let nav_items = Array.from(document.getElementsByClassName("nav-item"));
+nav_items.forEach(item => {
+    item.addEventListener('click', handleNaviguation);
+})
 
-const targets = {
-    "root": root,
-    "body": body,
-}
-
-////////////////////
-
-// all niviguation links share the `nav-item` class
-// in order to select them all at once
-// let nav_items = Array.from(document.getElementsByClassName("nav-item"));
-// nav_items.forEach(item => {
-//     item.addEventListener('click', handleNaviguationClick);
-// })
-
-const nav_home = document.getElementById("nav-home")
-const nav_logo = document.getElementById("nav-logo")
-const nav_play = document.getElementById("nav-play")
-const nav_chatapp = document.getElementById("nav-chatapp")
-const nav_profile = document.getElementById("nav-profile")
-const nav_stats = document.getElementById("nav-stats")
-const nav_login_page = document.getElementById("nav-login")
-const nav_signup_page = document.getElementById("nav-signup")
-
-nav_home.addEventListener('click', handleNaviguationClick);
-nav_logo.addEventListener('click', handleNaviguationClick);
-nav_play.addEventListener('click', handleNaviguationClick);
-nav_chatapp.addEventListener('click', handleNaviguationClick);
-nav_profile.addEventListener('click', handleNaviguationClick);
-nav_stats.addEventListener('click', handleNaviguationClick);
-if (nav_login_page) {
-    nav_login_page.addEventListener('click', handleNaviguationClick);
-}
-if (nav_signup_page) {
-    nav_signup_page.addEventListener('click', handleNaviguationClick);
-}
-
-function handleNaviguationClick(event) {
+// replaces default links behaviour with the following:
+// Fetch to get new content, swap UI, save state to browser history
+async function handleNaviguation(event) {
     event.preventDefault();
-    swap_ui(this.getAttribute("href"), "app-root");
-}
-
-async function swap_ui(endpoint, swap_target) {
+    const endpoint = this.getAttribute("href")
+    if (!endpoint)
+        return ;
+    const ui_target = "app-root"
     try {
         const response = await fetch(endpoint, {
             method: 'GET',
@@ -78,22 +47,30 @@ async function swap_ui(endpoint, swap_target) {
             }
         })
         if (response.ok === true) {
-            const data = await response.json()
-            const target = document.getElementById(swap_target)
-            target.innerHTML = "";
-            target.insertAdjacentHTML("afterbegin", data["html"])
-            document.title = data["title"] || "placeholder"
-            window.history.pushState({}, "", endpoint)
+            const json = await response.json()
+            updateUI(json, ui_target, endpoint)
+            window.history.pushState(json, "", endpoint)
         } else {
-            throw new Error('spa related, home')
+            throw new Error(`Fetch failed: ${response}`)
         }
     } catch (error) {
         console.log("Caught exception: ", error)
     }
- }
+}
 
-window.addEventListener('popstate', function (e) {
-    // this.alert("Went back")
-    let state = e.state;
-    console.log("Popstate: ", state)
+function updateUI(content, target) {
+    const t = document.getElementById(target)
+    if (t) {
+        document.title = content.title || "Ft_transcendance"
+        t.innerHTML = "";
+        t.insertAdjacentHTML("afterbegin", content["html"])
+    }
+}
+
+// updates UI when using the browser's backward/forward buttons
+window.addEventListener('popstate', function (event) {
+    let state = event.state;
+    if (state) {
+        updateUI(state, "app-root") // what if target is app-body?
+    }
 })
