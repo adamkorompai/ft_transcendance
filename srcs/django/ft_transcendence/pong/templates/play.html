@@ -7,18 +7,15 @@
 
 {% block body %}
 <div class="container">
-    <a href="{% url 'quick_play' %}" class="box-play">
+    <a href="{% url 'quick_play' %}" class="spa-nav-item box-play">
         <div>
             <h2>Quick play</h2>
         </div>
     </a>
-    <a href="{% url 'tournaments' %}" class="box-play">
+    <a href="{% url 'tournaments' %}" class="spa-nav-item box-play">
         <div>
             <h2>Tournaments</h2>
         </div>
     </a>
 </div>
-<script>
-    document.title = "{{title}}"
-</script>
 {% endblock %}

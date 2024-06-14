@@ -19,14 +19,6 @@
 		<h2>How it works?</h2>
 		<p>Two players control paddles on either side of the screen, using them to hit a ball back and forth. The goal is to make the ball pass your opponent's paddle to score points, while preventing the ball from passing your own paddle.</p>
 		<p>The game is simple, with the ball moving increasingly faster as the rally continues, making each successive return more challenging. The first player to reach a set score wins the game.</p>
-		<a
-			hx-get="/play/"
-			hx-target="#app-root"
-			hx-push-url="true">
-			<button class="mt-3 px-3 py-2">Start Playing</button>
-		</a>
-		<script>
-			document.title = "{{title}}"
-		</script>
+		<button href="/play/" class="spa-nav-item mt-3 px-3 py-2">Start Playing</button>
 	</div>
 {% endblock %}

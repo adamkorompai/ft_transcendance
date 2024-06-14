@@ -23,20 +23,28 @@ function generateRoom(userId) {
 //                       Single Page Application                              //
 ////////////////////////////////////////////////////////////////////////////////
 
+// re-attach events to corresponding classes
+// let nav_items = Array.from(document.getElementsByClassName("spa-nav-item"));
+// nav_items.forEach(item => {
+//     item.addEventListener('click', handleNaviguation);
+// })
+
 // adds event listeners to all naviguation links
-let nav_items = Array.from(document.getElementsByClassName("nav-item"));
-nav_items.forEach(item => {
-    item.addEventListener('click', handleNaviguation);
+let container = document.getElementById("app-body");
+container.addEventListener('click', (event) => {
+    if (event.target && event.target.classList.contains("spa-nav-item")) {
+        handleNaviguation(event);
+    }
 })
 
 // replaces default links behaviour with the following:
 // Fetch to get new content, swap UI, save state to browser history
 async function handleNaviguation(event) {
     event.preventDefault();
-    const endpoint = this.getAttribute("href")
+    const endpoint = event.target.getAttribute("href");
+    console.log(`Go to URL: ${endpoint}`);
     if (!endpoint)
         return ;
-    const ui_target = "app-root"
     try {
         const response = await fetch(endpoint, {
             method: 'GET',
@@ -47,14 +55,14 @@ async function handleNaviguation(event) {
             }
         })
         if (response.ok === true) {
-            const json = await response.json()
-            updateUI(json, ui_target, endpoint)
-            window.history.pushState(json, "", endpoint)
+            const json = await response.json();
+            updateUI(json, "app-root");
+            window.history.pushState(json, "", endpoint);
         } else {
-            throw new Error(`Fetch failed: ${response}`)
+            throw new Error(`Fetch failed: ${response}`);
         }
     } catch (error) {
-        console.log("Caught exception: ", error)
+        console.log("Caught exception: ", error);
     }
 }
 

@@ -34,7 +34,7 @@ def chat_page(request):
     }
     if 'HTTP_SPA_CHECK' in request.META:
         html = render_block_to_string('chat.html', 'body', context)
-        return HttpResponse(json.dumps({"html": html}), content_type="application/json")
+        return HttpResponse(json.dumps({"html": html, "title": "Chat"}), content_type="application/json")
     return render(request, "chat.html", context)
 
 def room(request, slug):

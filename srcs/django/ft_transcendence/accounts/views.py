@@ -57,12 +57,17 @@ def signup_v(request) -> HttpResponse:
             form.save()
             messages.success(request, f'Your account has been created! You are now able to log in.')
             context['form'] = AuthenticationForm()
-            context['title'] = "Login"
-            # must sent whole page otherwise csrf issue
             return render(request, 'accounts/login.html', context)
     else:
         form = UserRegisterForm()
     context['form'] = form
+
+    if "HTTP_SPA_CHECK" in request.META:
+        context['my_csrf'] = get_token(request)
+        html = render_block_to_string('accounts/signup.html', 'body', context)
+        return HttpResponse(json.dumps({
+            "html": html,"title": "Signup"
+        }), content_type="application/json")
 
     return render(request, 'accounts/signup.html', context)
 
@@ -91,6 +96,13 @@ def login_v(request) -> HttpResponse:
     else: # GET request
         form = AuthenticationForm()
     context['form'] = form
+
+    if "HTTP_SPA_CHECK" in request.META:
+        context['my_csrf'] = get_token(request)
+        html = render_block_to_string('accounts/login.html', 'body', context)
+        return HttpResponse(json.dumps({
+            "html": html,"title": "Login"
+        }), content_type="application/json")
     return render(request, 'accounts/login.html', context)
 
 """
@@ -187,7 +199,6 @@ def profile(request, username: str) -> HttpResponse:
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
         context['blocklist'] = displayed_user.profile.blocklist.all()
-        context['title'] = f"{username.capitalize()} (profile)"
 
         try:
             user_stats = UserStats.objects.get(user=displayed_user)
@@ -255,7 +266,11 @@ def profile(request, username: str) -> HttpResponse:
         b_body = render_block_to_string('accounts/profile.html', 'body', context)
         b_script = render_block_to_string('accounts/profile.html', 'script_body', context)
         html = b_body + b_script
-        return HttpResponse(json.dumps({"html": html}), content_type="application/json")
+        return HttpResponse(json.dumps({
+            "html": html,
+            "title": f"{username.capitalize()} (profile)"
+            }),
+            content_type="application/json")
     
     context['request'] = request
     context['my_csrf'] = get_token(request)
@@ -306,10 +321,15 @@ def editprofile(request) -> HttpResponse:
         p_form = ProfileUpdateForm(instance=request.user.profile)
     context['u_form'] = u_form
     context['p_form'] = p_form
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         context['request'] = request
-        b_body = render_block_to_string('accounts/editprofile.html', 'body', context)
-        return HttpResponse(b_body)
+        context['my_csrf'] = get_token(request)
+        html = render_block_to_string('accounts/editprofile.html', 'body', context)
+        return HttpResponse(json.dumps({
+            "html": html,
+            "title": "Edit Profile"
+            }),
+            content_type="application/json")
     return render(request, 'accounts/editprofile.html', context)
 
 """

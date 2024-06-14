@@ -5,7 +5,7 @@
 
     <!-- LOGO -->
     <a
-        class="nav-item logo"
+        class="spa-nav-item logo"
         id="nav-logo"
         href="{% url 'home:welcome' %}"
         {% if request.user.is_authenticated %} {% endif %}>
@@ -34,20 +34,20 @@
                     <a  id="nav-admin" class="nav-link nav_links text-light" href="/admin/">Admin</a>
                 </li>
                 {% endif %}
-                <li class="nav-item active">
-                    <a id="nav-home" href="/" class="nav-item nav-link active text-light">Home</a>
+                <li class="active">
+                    <a id="nav-home" href="/" class="spa-nav-item nav-link active text-light">Home</a>
                 </li>
-                <li class="nav-item active">
-                    <a  id="nav-play" class="nav-item nav-link nav_links text-light" href="/play/">Game</a>
+                <li class="active">
+                    <a  id="nav-play" class="spa-nav-item nav-link nav_links text-light" href="/play/">Game</a>
                 </li>
-                <li class="nav-item active">
-                    <a  id="nav-chatapp" class="nav-item nav-link nav_links text-light" href="/chatapp/">Chat</a>
+                <li class="active">
+                    <a  id="nav-chatapp" class="spa-nav-item nav-link nav_links text-light" href="/chatapp/">Chat</a>
                 </li>
-                <li class="nav-item active">
-                    <a  id="nav-stats" class="nav-item nav-link nav_links text-light" href="{% url 'user_stats' %}">Stats</a>
+                <li class="active">
+                    <a  id="nav-stats" class="spa-nav-item nav-link nav_links text-light" href="{% url 'user_stats' %}">Stats</a>
                 </li>
-                <li class="nav-item active">
-                    <a  id="nav-profile" class="nav-item nav-link nav_links text-light" href="{% url 'accounts:profile' %}{{ request.user.username }}">Profile</a>
+                <li class="nactive">
+                    <a  id="nav-profile" class="spa-nav-item nav-link nav_links text-light" href="{% url 'accounts:profile' %}{{ request.user.username }}">Profile</a>
                 </li>
             </ul>
         {% endif %}
@@ -65,17 +65,17 @@
                 </button>
             </form>
             
-            <a class="d-none d-md-block" href="{% url 'accounts:profile' %}{{request.user.username}}">
-                <img class="user_pic" src="{{ request.user.profile.image.url }}" width="48px" height="48px" alt="profile image">
-            </a>
-    
+            <img
+                class="spa-nav-item user_pic"
+                href="{% url 'accounts:profile' %}{{request.user.username}}"
+                src="{{ request.user.profile.image.url }}"
+                width="48px"
+                height="48px"
+                alt="profile image"
+            >
             {% else %}
-                <a id="nav-login" class="nav-item" href="{% url 'accounts:login' %}">
-                    <button class="cta">Log in</button>
-                </a>
-                <a id="nav-signup" class="nav-item" href="{% url 'accounts:signup' %}">
-                    <button class="cta ms-2">Sign up</button>
-                </a>
+                <button id="nav-login" class="spa-nav-item cta" href="{% url 'accounts:login' %}">Log in</button>
+                <button id="nav-signup" class="spa-nav-item cta ms-2" href="{% url 'accounts:signup' %}">Sign up</button>
             {% endif %}
         </div>
     </div>

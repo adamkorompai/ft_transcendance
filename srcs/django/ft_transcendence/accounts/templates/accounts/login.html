@@ -14,9 +14,13 @@
                 <h1>Welcome Back</h1>
                 <p>Not registered yet? <a href="{% url 'accounts:signup'%}">Sign up</a></p>
                 <hr>
-                <form hx-post="{% url 'accounts:login' %}" hx-target="#app-body">
+                <form action="{% url 'accounts:login' %}" method="POST">
                     <div class="form_inputs">
-                        {% csrf_token %}
+                        {% if csrf_token %}
+							{% csrf_token %}
+						{% else %}
+							<input type="hidden" name="csrfmiddlewaretoken" value="{{ my_csrf }}">
+						{% endif %}
                         {{ form | crispy }}
                     </div>
                     <div class="form_cta mt-4">

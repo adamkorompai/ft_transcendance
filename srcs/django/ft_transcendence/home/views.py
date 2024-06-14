@@ -17,13 +17,10 @@ def welcome(request):
 	context = {
 		"show_alert": True,
 		"all_users": User.objects.all(),
-		'title': "Home"
 	}
 	log.info("In welcome views")
 	log.info(request.META)
 	if 'HTTP_SPA_CHECK' in request.META:
-		log.info("IS using AJAX")
 		html = render_block_to_string('welcome.html', 'body', context)
-		return HttpResponse(json.dumps({"html": html}), content_type="application/json")
-	log.info("NOTTT using AJAX")
+		return HttpResponse(json.dumps({"html": html, "title": "Home"}), content_type="application/json")
 	return render(request, 'welcome.html', context)
