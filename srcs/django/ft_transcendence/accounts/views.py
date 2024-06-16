@@ -20,16 +20,18 @@ from render_block import render_block_to_string
 from django.middleware.csrf import get_token
 from stats.models import UserStats
 import logging
+import os
 
 
 # get acces to environment variables
 log = logging.getLogger(__name__)
 logging.basicConfig(filename="logs.txt", encoding='utf-8', level=logging.DEBUG)
-load_dotenv()
 
-authorize_uri = "https://api.intra.42.fr/oauth/authorize?\
-	client_id=u-s4t2ud-c6b234d3edfab001ec93a17143651dcef4184d26390c68e82a5d64bd4ea6686e\
-	&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Faccounts%2Fcallback%2F\
+load_dotenv('.env')
+
+authorize_uri = f"https://api.intra.42.fr/oauth/authorize?\
+	client_id={os.getenv('CLIENT_ID')}\
+	&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Faccounts%2Fcallback%2F\
 	&scope=public\
 	&response_type=code\
 	&state="

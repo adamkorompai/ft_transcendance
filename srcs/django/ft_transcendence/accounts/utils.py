@@ -17,7 +17,7 @@ class Oauth42:
             'client_id': os.getenv('CLIENT_ID'),
             'client_secret': os.getenv('CLIENT_SECRET'),
             'code': code,
-            'redirect_uri': 'http://localhost:8000/accounts/callback/' # YOU..AAARG!
+            'redirect_uri': 'https://127.0.0.1:8000/accounts/callback/' # YOU..AAARG!
         }
         response = requests.post(url, data=data)
         if response.status_code == 200:
