@@ -265,7 +265,7 @@ def profile(request, username: str) -> HttpResponse:
         context['my_csrf'] = get_token(request)
         b_body = render_block_to_string('accounts/profile.html', 'body', context)
         b_script = render_block_to_string('accounts/profile.html', 'script_body', context)
-        html = b_body + b_script
+        html = b_body + "\n" + b_script
         return HttpResponse(json.dumps({
             "html": html,
             "title": f"{username.capitalize()} (profile)"
@@ -412,6 +412,7 @@ def accept_friend_request(request) -> HttpResponse:
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
                         'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
+                        'my_csrf': get_token(request)
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:
@@ -448,6 +449,7 @@ def decline_friend_request(request) -> HttpResponse:
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
                         'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
+                        'my_csrf': get_token(request),
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                     payload['response'] = "Friend request declined"

@@ -82,3 +82,165 @@ window.addEventListener('popstate', function (event) {
         updateUI(state, "app-root") // what if target is app-body?
     }
 })
+
+////////////////////////////////////////////////////////////////////////////////
+//                                  Pong                                      //
+////////////////////////////////////////////////////////////////////////////////
+
+// const player1ReadyBox = document.getElementById('player1-ready');
+// const player2ReadyBox = document.getElementById('player2-ready');
+// const opponentInput = document.getElementById('opponent-username');
+// const readyText = document.getElementById('ready-text');
+// const opponentImage = document.getElementById('opponent-image');
+// const suggestionList = document.getElementById('opponent-suggestions');
+
+// let player1Ready = false;
+// let player2Ready = false;
+// let opponentValid = false;
+
+// function toggleReady(player) {
+//     if (player === 'player1') {
+//         player1Ready = !player1Ready;
+//         player1ReadyBox.classList.toggle('ready-green', player1Ready);
+//         player1ReadyBox.classList.toggle('ready-red', !player1Ready);
+//         checkGameReady();
+//     } else if (player === 'player2') {
+//         validateOpponent().then(() => {
+//             if (!player2Ready && opponentInput.value.trim() && !opponentValid) {
+//                 return;
+//             }
+
+//             player2Ready = !player2Ready;
+//             player2ReadyBox.classList.toggle('ready-green', player2Ready);
+//             player2ReadyBox.classList.toggle('ready-red', !player2Ready);
+//             opponentInput.readOnly = player2Ready;
+
+//             if (!player2Ready) {
+//                 opponentValid = false;
+//                 validateOpponent();
+//             }
+
+//             checkGameReady();
+//         });
+//     }
+// }
+
+// async function checkGameReady() {
+//     if (player1Ready && player2Ready) {
+//         const player1Username = "{{ request.user.username }}";
+//         const player2Username = opponentInput.value.trim();
+
+//         setTimeout(() => {
+//             let form;
+//             if (player2Username && opponentValid) {
+//                 form = createForm("{% url 'pong_game' %}", {
+//                     player1: player1Username,
+//                     player2: player2Username
+//                 });
+//             } else {
+//                 form = createForm("{% url 'pong_ia_game' %}", {
+//                     player1: player1Username
+//                 });
+//             }
+//             document.body.appendChild(form);
+//             form.submit();
+//         }, 2000);
+//     }
+// }
+
+// function createForm(action, inputs) {
+//     const form = document.createElement('form');
+//     form.action = action;
+//     form.method = 'POST';
+//     form.innerHTML = `{% csrf_token %}`;
+//     for (const name in inputs) {
+//         form.innerHTML += `<input type="hidden" name="${name}" value="${inputs[name]}">`;
+//     }
+//     return form;
+// }
+
+// const debounce = (func, delay) => {
+//     let timeoutId;
+//     return (...args) => {
+//         clearTimeout(timeoutId);
+//         timeoutId = setTimeout(() => func(...args), delay);
+//     };
+// };
+
+// const validateOpponentDebounced = debounce(validateOpponent, 500);
+
+// async function validateOpponent() {
+//     const opponentName = opponentInput.value.trim();
+//     const playerName = "{{ request.user.username }}";
+
+//     if (opponentName === '') {
+//         resetOpponentUI();
+//         return;
+//     }
+
+//     if (playerName === opponentName) {
+//         opponentImage.src = "{% static '../media/default.png' %}";
+//         opponentValid = false;
+//         player2ReadyBox.classList.add('disabled');
+//         readyText.textContent = 'Invalid Selection';
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch('/play/check-user/' + opponentName + '/');
+//         const data = await response.json();
+//         if (data.exists) {
+//             opponentImage.src = data.profile_image;
+//             opponentValid = true;
+//             player2ReadyBox.classList.remove('disabled');
+//             if (!player2Ready) {
+//                 readyText.textContent = 'Ready ?';
+//             }
+//         } else {
+//             resetOpponentUI();
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
+
+// function resetOpponentUI() {
+//     opponentImage.src = "{% static '../media/default.png' %}";
+//     opponentValid = false;
+//     player2ReadyBox.classList.add('disabled');
+//     readyText.textContent = 'IA Game';
+// }
+
+// async function searchOpponents() {
+//     const opponentName = opponentInput.value.trim();
+
+//     if (opponentName === '') {
+//         readyText.textContent = 'IA Game';
+//         suggestionList.innerHTML = '';
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch('/play/search-opponents/?query=' + encodeURIComponent(opponentName));
+//         const data = await response.json();
+//         suggestionList.innerHTML = '';
+//         data.forEach(opponent => {
+//             const suggestionItem = document.createElement('li');
+//             suggestionItem.textContent = opponent.username;
+//             suggestionItem.addEventListener('click', function() {
+//                 opponentInput.value = opponent.username;
+//                 validateOpponentDebounced();
+//                 suggestionList.innerHTML = '';
+//             });
+//             suggestionList.appendChild(suggestionItem);
+//         });
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
+
+// window.addEventListener('pageshow', function(event) {
+//     if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+//         opponentInput.value = '';
+//     }
+// });

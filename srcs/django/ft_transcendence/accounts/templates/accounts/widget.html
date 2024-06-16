@@ -6,17 +6,15 @@
 <div class="users_list" id="friends_cards">
     {% for f in friends %}
     <div class="user_card">
-        <a
+        <img
             href="/accounts/profile/{{ f.username }}"
-            hx-target="#app-root"
-            hx-push-url="true">
-            <img
-                src="{{ f.profile.image.url }}"
-                width="48px"
-                height="48px"
-                alt="profile picture"
-            >
-        </a>
+            class="spa-nav-item"
+            src="{{ f.profile.image.url }}"
+            width="48px"
+            height="48px"
+            alt="profile picture"
+            role="button"
+        >
         <p>{{ f.username }}</p>
     </div>
     {% endfor %}
@@ -31,12 +29,15 @@
 {% if request.user.is_authenticated and is_self == True%}
     {% for request in friend_requests %}
     <div class="request_card">
-        <a 
+        <img 
             href="/accounts/profile/{{ request.sender.username}}"
-            hx-target="#app-root"
-            hx-push-url="true">
-            <img src="{{ request.sender.profile.image.url }}" width="48px" height="48px" alt="profile picture">
-        </a>
+            class="spa-nav-item"
+            src="{{ request.sender.profile.image.url }}"
+            width="48px"
+            height="48px"
+            alt="profile picture"
+            role="button"
+        >
         <div>
             <p><b>{{ request.sender | capfirst }}</b></p>
             <div>
@@ -44,15 +45,17 @@
                     onclick="acceptFriendRequest(
                         '{{request.id}}',
                         'widget_status_bar',
+                        {% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%},
                     )"
                     class="btn_requests">
                     Confirm
                 </button>
                 <button 
-                    onclick='declineFriendRequest(
-                        "{{request.id}}",
-                        "widget_status_bar",
-                    )' 
+                    onclick="declineFriendRequest(
+                        '{{request.id}}',
+                        'widget_status_bar',
+                        {% if csrf_token %} '{{ csrf_token }}' {% else %} '{{ my_csrf }}' {%endif%},
+                    )"
                     class="btn_discrete btn_passive">
                     Ignore
                 </button>
@@ -69,12 +72,15 @@
     {% for usr in all_users %}
         {% if usr != request.user and usr not in friends and usr not in blocklist %}
             <div class="user_card">
-                <a 
+                <img
                     href="/accounts/profile/{{ usr.username }}"
-                    hx-target="#app-root"
-                    hx-push-url="true">
-                    <img src="{{ usr.profile.image.url }}" width="48px" height="48px" alt="profile picture">
-                </a>
+                    class="spa-nav-item"
+                    src="{{ usr.profile.image.url }}"
+                    width="48px"
+                    height="48px"
+                    alt="profile picture"
+                    role="button"
+                >
                 <p>{{ usr.username }}</p>
             </div>
         {% endif %}
@@ -90,12 +96,15 @@
 
         {% for blocked_user in blocklist %}
         <div class="user_card">
-            <a 
+            <img
                 href="/accounts/profile/{{ blocked_user.username }}"
-                hx-target="#app-root"
-                hx-push-url="true">
-                <img src="{{ blocked_user.profile.image.url }}" width="48px" height="48px" alt="profile picture">
-            </a>
+                class="spa-nav-item"
+                src="{{ blocked_user.profile.image.url }}"
+                width="48px"
+                height="48px"
+                alt="profile picture"
+                role="button"
+            >
             <p>{{ blocked_user.username }}</p>
         </div>
         {% endfor %}

@@ -45,7 +45,7 @@ def room(request, slug):
     other_username = username2 if request.user.username == username1 else username1
     other_user = get_object_or_404(User, username=other_username)
     profile = get_object_or_404(Profile, user=other_user)
-    context = {"slug":slug, "room_name":room_name, 'messages':messages, 'user_id':request.user.id, 'profile':profile}
+    context = {"slug":slug, "room_name":room_name, 'messages':messages, 'user_id':request.user.id, 'profile':profile, 'other_user': other_user}
     return render(request, "room.html", context)
 
 def create_room(request):
