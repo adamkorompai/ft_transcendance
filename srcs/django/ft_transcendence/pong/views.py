@@ -52,17 +52,17 @@ def pong_ia_game(request):
     return redirect('quick_play')
 
 def play(request):
-    if 'HTTP_HX_REQUEST' in request.META:
-        context = {"request": request, 'title': 'Play'}
+    if 'HTTP_SPA_CHECK' in request.META:
+        context = {"request": request}
         html = render_block_to_string('play.html', 'body', context)
-        return HttpResponse(html)
+        return HttpResponse(json.dumps({"html": html, "title": "Play"}), content_type="application/json")
     return render(request, 'play.html', {'title': "Play"})
 
 def quick_play(request):
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         context = {"request": request}
         html = render_block_to_string('quickplay.html', 'body', context)
-        return HttpResponse(html)
+        return HttpResponse(json.dumps({"html": html, "title": "Quickplay"}), content_type="application/json")
     return render(request, 'quickplay.html')
 
 def tournaments(request):

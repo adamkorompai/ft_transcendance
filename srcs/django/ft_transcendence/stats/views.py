@@ -4,6 +4,7 @@ from .models import UserStats
 from django.db.models import F
 from render_block import render_block_to_string
 from django.http import HttpResponse
+import json
 
 @login_required
 def user_stats(request):
@@ -69,7 +70,7 @@ def user_stats(request):
         'request': request,
         'title': "Statistics"
     }
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         html = render_block_to_string('stats/user_stats.html', 'body', context)
-        return HttpResponse(html)
+        return HttpResponse(json.dumps({"html": html, "title": "Statistics"}), content_type="application/json")
     return render(request, 'stats/user_stats.html', context)
