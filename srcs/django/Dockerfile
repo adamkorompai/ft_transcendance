@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir psycopg2-binary \
 				channels \
 				channels_postgres \
 				daphne \
+				whitenoise \
 				requests \
 				# access environment variables
 				python-dotenv \
