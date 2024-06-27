@@ -1,19 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from render_block import render_block_to_string
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 import random, math
 from django.urls import reverse
 from math import ceil, log2
 from django.db.models import Max
 from django.templatetags.static import static
-from django.http import JsonResponse
 from stats.models import UserStats
 import json
-from .forms import TournamentForm
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import Tournament, TournamentParticipant, TournamentMatch
 from . import views
@@ -316,7 +312,7 @@ def get_next_match(request, tournament_id):
         else:
             # Le tournoi est terminé
             winner = tournament.winner.username if tournament.winner else "Unknown"
-            tournament.delete()  # Suppression automatique du tournoi
+            tournament.delete()
             return JsonResponse({'success': False, 'error': 'Tournament finished', 'winner': winner})
     
     if next_match:
