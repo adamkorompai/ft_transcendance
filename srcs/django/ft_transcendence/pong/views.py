@@ -2,16 +2,21 @@ from django.shortcuts import render, redirect
 from render_block import render_block_to_string
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from .models import Tournament, TournamentMatch, Announcement
 import random, math
 from django.urls import reverse
 from math import ceil, log2
 from django.db.models import Max
 from django.templatetags.static import static
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 from stats.models import UserStats
 import json
+from .forms import TournamentForm
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+from .models import Tournament, TournamentParticipant, TournamentMatch
+from . import views
 
 # Create your views here.
 def pong_game(request):
@@ -52,149 +57,18 @@ def pong_ia_game(request):
     return redirect('quick_play')
 
 def play(request):
-    if 'HTTP_HX_REQUEST' in request.META:
-        context = {"request": request, 'title': 'Play'}
+    if 'HTTP_SPA_CHECK' in request.META:
+        context = {"request": request}
         html = render_block_to_string('play.html', 'body', context)
-        return HttpResponse(html)
+        return HttpResponse(json.dumps({"html": html, "title": "Play"}), content_type="application/json")
     return render(request, 'play.html', {'title': "Play"})
 
 def quick_play(request):
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         context = {"request": request}
         html = render_block_to_string('quickplay.html', 'body', context)
-        return HttpResponse(html)
+        return HttpResponse(json.dumps({"html": html, "title": "Quickplay"}), content_type="application/json")
     return render(request, 'quickplay.html')
-
-def tournaments(request):
-    """
-    View to display tournaments.
-    """
-    last_tournament = Tournament.objects.last()
-    if last_tournament and not last_tournament.is_finished:
-        return redirect('tree', tournament_id=last_tournament.id)
-    users = User.objects.all()
-    context = {"users": users}
-    return render(request, 'tournaments.html', context)
-
-def create_tournament(request):
-    """
-    View to create a new tournament.
-    """
-    if request.method == 'POST':
-        nb_players = int(request.POST.get('nb_players'))
-        player_ids = request.POST.getlist('players')
-
-        tournament = Tournament.objects.create(nb_players=nb_players)
-
-        # Create first round matches
-        if nb_players >= 2:
-            # Assuming the players are selected randomly, you can implement your own logic here
-            selected_players = player_ids[:nb_players]
-            for i in range(0, nb_players, 2):
-                match = TournamentMatch.objects.create(
-                    tournament=tournament,
-                    participant1_id=selected_players[i],
-                    participant2_id=selected_players[i + 1]
-                )
-
-        return redirect('tree', tournament_id=tournament.id)
-    else:
-        users = User.objects.all()
-        context = {'users': users}
-        return render(request, 'create_tournament.html', context)
-
-def tree(request, tournament_id):
-    """
-    View to display the tournament tree.
-    """
-    try:
-        tournament = Tournament.objects.get(pk=tournament_id)
-        matches = TournamentMatch.objects.filter(tournament=tournament)
-        nb_players = tournament.nb_players
-
-        # Determine the template name based on the number of players
-        if nb_players == 4:
-            template_name = 'tree_4.html'
-        elif nb_players == 8:
-            template_name = 'tree_8.html'
-        elif nb_players == 16:
-            template_name = 'tree_16.html'
-
-        try:
-            announcement = Announcement.objects.latest('timestamp')
-        except Announcement.DoesNotExist:
-            announcement = None
-
-    except Tournament.DoesNotExist:
-        tournament = None
-        matches = None
-        announcement = None
-
-    return render(request, template_name, {'tournament': tournament, 'matches': matches, 'announcement': announcement})
-
-def start_game(request, match_id):
-    match = TournamentMatch.objects.get(id=match_id)
-    return render(request, 'tmp.html', {'match': match})
-
-def record_game_winner(request, match_id):
-    if request.method == 'POST':
-        match = TournamentMatch.objects.get(id=match_id)
-        winner_id = request.POST.get('winner')
-        winner = User.objects.get(id=winner_id)
-        match.winner = winner
-        match.save()
-        announcement_content = f"The next match is ready to play! {winner} just won his match !"
-        Announcement.objects.create(title="Next Match Ready", content=announcement_content)
-
-        tournament = match.tournament
-        next_round = match.round_number + 1
-        
-        # Check if all matches in this round have winners
-        if not TournamentMatch.objects.filter(tournament=tournament, round_number=match.round_number, winner=None).exists():
-            # Check if it's the final round
-            if next_round * 2 <= tournament.nb_players:
-                # Generate matches for the next round
-                generate_next_round_matches(tournament)
-            else:
-                # Tournament finished
-                tournament.is_finished = True
-                tournament.save()
-                Announcement.objects.create(title="Tournament Finished", content="The tournament is finished!")
-
-    return redirect('tree', tournament_id=match.tournament_id)
-
-def generate_next_round_matches(tournament):
-    # Get the maximum round number played so far in the tournament
-    max_round_number = TournamentMatch.objects.filter(tournament=tournament).aggregate(Max('round_number'))['round_number__max'] or 0
-    
-    # Increment the round number for the next round
-    next_round_number = max_round_number + 1
-    
-    # Retrieve the winners of the current round
-    winners = TournamentMatch.objects.filter(tournament=tournament, winner__isnull=False, round_number=max_round_number)
-    
-    # Create matches for the next round using the winners of the current round
-    for i in range(0, len(winners), 2):
-
-        if i + 1 < len(winners):
-            participant1 = winners[i].winner
-            participant2 = winners[i + 1].winner
-
-            # Create a match between the winners if it doesn't already exist
-            if not TournamentMatch.objects.filter(tournament=tournament, participant1=participant1, participant2=participant2).exists():
-                TournamentMatch.objects.create(
-                    tournament=tournament,
-                    participant1=participant1,
-                    participant2=participant2,
-                    round_number=next_round_number
-                )
-
-def end_tournament(request, tournament_id):
-    tournament = Tournament.objects.get(id=tournament_id)
-    tournament.is_finished = True
-    tournament.save()
-    Announcement.objects.all().delete()
-    return redirect('play')
 
 def check_user(request, username):
     try:
@@ -207,6 +81,17 @@ def check_user(request, username):
 
 def save_game_stats(request):
     if request.method == 'POST':
+        data = json.loads(request.body)
+        tournament_id = data['tournament_id']
+        winner_username = data['winner']
+        
+        tournament = get_object_or_404(Tournament, id=tournament_id)
+        current_match = tournament.get_current_match()
+        
+        if current_match:
+            winner = User.objects.get(username=winner_username)
+            current_match.winner = winner
+            current_match.save()
         data = json.loads(request.body)
         player1_username = data['player1']
         player2_username = data['player2']
@@ -317,3 +202,128 @@ def search_opponents(request):
     opponents = User.objects.filter(username__istartswith=query)
     data = [{'username': opponent.username} for opponent in opponents]
     return JsonResponse(data, safe=False)
+
+def tournaments(request):
+    tournaments = Tournament.objects.all()
+    return render(request, 'tournaments.html', {'tournaments': tournaments})
+
+def create_tournament(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        number_of_players = request.POST.get('number_of_players')
+        # Récupérer l'utilisateur actuel pour après ctrl le createur
+        creator = request.user
+        # Creation du tournoi
+        Tournament.objects.create(name=name, number_of_players=number_of_players, creator=creator)
+        return redirect('tournaments')
+    return render(request, 'tournaments.html')
+
+def tournament_detail(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+    participants = tournament.participants.all()
+    user_in_tournament = participants.filter(player=request.user).exists()
+
+    if tournament.is_started and tournament.creator != request.user:
+        messages.error(request, "You are not authorized to access this tournament details.")
+        return redirect('tournaments')
+
+    context = {
+        'tournament': tournament,
+        'participants': participants,
+        'can_start': tournament.is_ready_to_start() and not tournament.is_started and tournament.creator == request.user,
+        'user_in_tournament': user_in_tournament,
+        'is_creator': tournament.creator == request.user,
+    }
+    return render(request, 'tournament_detail.html', context)
+
+def tournament_start(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+
+    if request.method == 'POST' and tournament.is_ready_to_start() and not tournament.is_started and tournament.creator == request.user:
+        tournament.start()
+        messages.success(request, 'Tournament has started!')
+        return redirect('tournament_game', tournament_id=tournament.id)
+    else:
+        if not tournament.is_ready_to_start():
+            messages.error(request, 'The tournament is not ready to start yet.')
+        elif tournament.is_started:
+            messages.error(request, 'The tournament has already started.')
+        else:
+            messages.error(request, 'You are not authorized to start this tournament.')
+
+    return redirect('tournament_detail', tournament_id=tournament_id)
+
+def tournament_signup(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+    if tournament.is_started:
+        messages.error(request, "You cannot sign up for this tournament as it has already started.")
+        return redirect('tournament_detail', tournament_id=tournament.id)
+
+    if request.method == 'POST':
+        # ctrl si l'user est deja inscrit
+        if TournamentParticipant.objects.filter(tournament=tournament, player=request.user).exists():
+            messages.error(request, 'You are already signed up for this tournament.')
+        else:
+            TournamentParticipant.objects.create(tournament=tournament, player=request.user)
+            messages.success(request, 'You have successfully signed up for the tournament.')
+    return redirect('tournament_detail', tournament_id=tournament.id)
+
+def tournament_game(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+    current_match = tournament.get_current_match()
+    
+    if not current_match and not tournament.is_finished:
+        tournament.create_next_round()
+        current_match = tournament.get_current_match()
+
+    context = {
+        'tournament': tournament,
+        'current_match': current_match,
+    }
+    return render(request, 'tournament_game.html', context)
+    
+def tournament_delete(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+
+    # ctrl si l'user est le createur du tournoi
+    if tournament.creator != request.user:
+        messages.error(request, "You are not authorized to delete this tournament.")
+        return redirect('tournament_detail', tournament_id=tournament.id)
+
+    # ctrl si le tournoi a deja start
+    if tournament.is_started:
+        messages.error(request, "You cannot delete a tournament that has already started.")
+        return redirect('tournament_detail', tournament_id=tournament.id)
+
+    # del le tournoi
+    tournament.delete()
+    messages.success(request, "Tournament has been deleted successfully.")
+    return redirect('tournaments')
+
+def submit_match_result(request, tournament_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def get_next_match(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id)
+    next_match = tournament.get_current_match()
+    
+    if not next_match:
+        if tournament.create_next_round():
+            next_match = tournament.get_current_match()
+        else:
+            # Le tournoi est terminé
+            winner = tournament.winner.username if tournament.winner else "Unknown"
+            tournament.delete()  # Suppression automatique du tournoi
+            return JsonResponse({'success': False, 'error': 'Tournament finished', 'winner': winner})
+    
+    if next_match:
+        return JsonResponse({
+            'success': True,
+            'player1': next_match.player1.username,
+            'player2': next_match.player2.username if next_match.player2 else None,
+        })
+    else:
+        return JsonResponse({'success': False, 'error': 'No more matches'})

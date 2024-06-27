@@ -5,44 +5,41 @@
     Tournaments
 {% endblock %}
 
-{% block styles %}
-{% endblock %}
-
 {% block body %}
-<form method="post" id="tournament_form" action="{% url 'create_tournament' %}">
-    {% csrf_token %}
-    <label for="id_nb_players">Number of Players:</label>
-    <select name="nb_players" id="id_nb_players" required>
-        <option value="4">4</option>
-        <option value="8">8</option>
-        <option value="16">16</option>
-    </select><br><br>
+<div class="container_tournament">
+    <h1>Tournaments</h1>
+</div>
+<h4>create Tournaments :</h4>
+    <form action="{% url 'create_tournament' %}" method="post">
+        {% csrf_token %}
+        <label for="tournament_name">Tournament Name:</label>
+        <input type="text" id="tournament_name" name="name" required>
+        
+        <label for="tournament_players">Number of Players:</label>
+        <select id="tournament_players" name="number_of_players" required>
+            <option value="4">4 Players</option>
+            <option value="8">8 Players</option>
+            <option value="16">16 Players</option>
+        </select>
+        
+        <button type="submit" class="btn btn-primary">Create Tournament</button>
+    </form>
 
-    <label for="id_players">Select Players:</label>
-    <select name="players" id="id_players" multiple required>
-        {% for user in users %}
-                <option value="{{ user.id }}">{{ user.username }}</option>
-        {% endfor %}
-    </select><br><br>
+    <hr>
 
-    <button type="submit">Create Tournament</button>
-</form>
+    <!-- Liste des tournois -->
+    {% if tournaments %}
+        <h2>Existing Tournaments:</h2>
+        <ul>
+            {% for tournament in tournaments %}
+                <li>
+                    <a href="{% url 'tournament_detail' tournament.id %}">{{ tournament.name }}</a>
+                    ({{ tournament.number_of_players }} Players)
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No tournaments available.</p>
+    {% endif %}
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var form = document.getElementById("tournament_form");
-        var nbPlayersSelect = document.getElementById("id_nb_players");
-        var playersSelect = document.getElementById("id_players");
-
-        form.addEventListener("submit", function(event) {
-            var nbPlayers = parseInt(nbPlayersSelect.value);
-            var selectedPlayers = playersSelect.selectedOptions.length;
-            
-            if (selectedPlayers !== nbPlayers) {
-                alert("Please select exactly " + nbPlayers + " players.");
-                event.preventDefault();
-            }
-        });
-    });
-</script>
 {% endblock %}

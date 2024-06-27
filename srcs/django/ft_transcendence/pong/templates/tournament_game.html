@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Tournament Game
+{% endblock %}
+
+{% block body %}
+<div class="container_tournament3">
+    <h2 class="text-center mb-4">{{ tournament.name }}</h2>
+
+    {% if current_match %}
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="player-info d-flex justify-content-between mb-3">
+                <div class="player d-flex flex-column align-items-center">
+                    <img src="{{ current_match.player1.profile.image.url }}" alt="Player 1" class="rounded-circle" style="width: 100px; height: 100px;">
+                    <span class="mt-2">{{ current_match.player1.username }}</span>
+                </div>
+                <div class="player d-flex flex-column align-items-center">
+                    <img src="{{ current_match.player2.profile.image.url }}" alt="Player 2" class="rounded-circle" style="width: 100px; height: 100px;">
+                    <span class="mt-2">{{ current_match.player2.username }}</span>
+                </div>
+            </div>
+            <div class="game-container2 d-flex justify-content-center mb-4">
+                <canvas id="pongCanvas" class="pong-canvas" width="800" height="400" style="display: none;"></canvas>
+            </div>
+            <div class="text-center">
+                <button id="startGameButton" class="btn btn-primary mb-3">Start Game</button>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <button id="nextGameButton" class="btn btn-primary" style="display: none;" onclick="nextGame()">Next Game</button>
+            <button id="finishTournamentButton" class="btn btn-success" style="display: none;" onclick="finishTournament()">Finish Tournament</button>
+        </div>
+    </div>
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h3>No active matches</h3>
+                <button id="nextGameButton" class="btn btn-primary" onclick="nextGame()">Next Game</button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    var csrfToken = '{{ csrf_token }}';
+    var player1Username = '{{ current_match.player1.username }}';
+    var player2Username = '{{ current_match.player2.username }}';
+    var tournamentId = '{{ tournament.id }}';
+</script>
+<script src="{% static 'js/tournament_game_logic.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var startGameButton = document.getElementById('startGameButton');
+        var nextGameButton = document.getElementById('nextGameButton');
+        var pongCanvas = document.getElementById('pongCanvas');
+
+        startGameButton.addEventListener('click', function() {
+            startGameButton.style.display = 'none';
+            pongCanvas.style.display = 'block';
+            startGame();
+        });
+
+        nextGameButton.addEventListener('click', function() {
+            nextGame();
+        });
+    });
+</script>
+{% endblock %}
