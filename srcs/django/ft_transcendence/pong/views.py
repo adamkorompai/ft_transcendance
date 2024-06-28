@@ -15,6 +15,7 @@ from .models import Tournament, TournamentParticipant, TournamentMatch
 from . import views
 
 # Create your views here.
+@login_required(login_url='/accounts/login/?redirected=true')
 def pong_game(request):
     if request.method == 'POST':
         player1_username = request.POST.get('player1')
@@ -40,6 +41,7 @@ def pong_game(request):
     
     return redirect('quick_play')
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def pong_ia_game(request):
     if request.method == 'POST':
         player1_username = request.POST.get('player1')
@@ -52,6 +54,7 @@ def pong_ia_game(request):
         return render(request, 'game_ia.html', context)
     return redirect('quick_play')
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def play(request):
     if 'HTTP_SPA_CHECK' in request.META:
         context = {"request": request}
@@ -59,6 +62,7 @@ def play(request):
         return HttpResponse(json.dumps({"html": html, "title": "Play"}), content_type="application/json")
     return render(request, 'play.html', {'title': "Play"})
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def quick_play(request):
     if 'HTTP_SPA_CHECK' in request.META:
         context = {"request": request}
@@ -66,6 +70,7 @@ def quick_play(request):
         return HttpResponse(json.dumps({"html": html, "title": "Quickplay"}), content_type="application/json")
     return render(request, 'quickplay.html')
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def check_user(request, username):
     try:
         user = User.objects.get(username=username)
@@ -75,6 +80,7 @@ def check_user(request, username):
         default_image = static('../media/default.png')
         return JsonResponse({'exists': False, 'profile_image': default_image})
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def save_game_stats(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -153,6 +159,7 @@ def save_game_stats(request):
 
     return JsonResponse({'status': 'error'})
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def save_ia_game_stats(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -193,16 +200,19 @@ def save_ia_game_stats(request):
 
     return JsonResponse({'status': 'error'})
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def search_opponents(request):
     query = request.GET.get('query', '')
     opponents = User.objects.filter(username__istartswith=query)
     data = [{'username': opponent.username} for opponent in opponents]
     return JsonResponse(data, safe=False)
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def tournaments(request):
     tournaments = Tournament.objects.all()
     return render(request, 'tournaments.html', {'tournaments': tournaments})
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def create_tournament(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -214,6 +224,7 @@ def create_tournament(request):
         return redirect('tournaments')
     return render(request, 'tournaments.html')
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def tournament_detail(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     participants = tournament.participants.all()
@@ -232,6 +243,7 @@ def tournament_detail(request, tournament_id):
     }
     return render(request, 'tournament_detail.html', context)
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def tournament_start(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
 
@@ -249,6 +261,7 @@ def tournament_start(request, tournament_id):
 
     return redirect('tournament_detail', tournament_id=tournament_id)
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def tournament_signup(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if tournament.is_started:
@@ -264,6 +277,7 @@ def tournament_signup(request, tournament_id):
             messages.success(request, 'You have successfully signed up for the tournament.')
     return redirect('tournament_detail', tournament_id=tournament.id)
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def tournament_game(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     current_match = tournament.get_current_match()
@@ -277,7 +291,8 @@ def tournament_game(request, tournament_id):
         'current_match': current_match,
     }
     return render(request, 'tournament_game.html', context)
-    
+
+@login_required(login_url='/accounts/login/?redirected=true')    
 def tournament_delete(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
 
@@ -296,12 +311,14 @@ def tournament_delete(request, tournament_id):
     messages.success(request, "Tournament has been deleted successfully.")
     return redirect('tournaments')
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def submit_match_result(request, tournament_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         return JsonResponse({'success': True})
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+@login_required(login_url='/accounts/login/?redirected=true')
 def get_next_match(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     next_match = tournament.get_current_match()

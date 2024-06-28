@@ -245,7 +245,7 @@ function nextGame() {
             
             updatePlayerDisplay(data.player1, data.player2);
             
-            alert(`Next match: ${data.player1} vs ${data.player2}`);
+            // alert(`Next match: ${data.player1} vs ${data.player2}`);
         } else if (data.error === 'Tournament finished') {
             alert(`Le tournoi est terminé ! Le gagnant est ${data.winner} !`);
             window.location.href = "/play/tournaments/";

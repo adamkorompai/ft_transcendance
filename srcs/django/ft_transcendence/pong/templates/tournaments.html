@@ -13,7 +13,7 @@
     <form action="{% url 'create_tournament' %}" method="post">
         {% csrf_token %}
         <label for="tournament_name">Tournament Name:</label>
-        <input type="text" id="tournament_name" name="name" required>
+        <input type="text" id="tournament_name" name="name" maxlength="99" required>
         
         <label for="tournament_players">Number of Players:</label>
         <select id="tournament_players" name="number_of_players" required>
