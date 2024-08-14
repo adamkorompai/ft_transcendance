@@ -5,9 +5,10 @@
 
     <!-- LOGO -->
     <a
-        class="logo"
+        class="spa-nav-item logo"
+        id="nav-logo"
         href="{% url 'home:welcome' %}"
-        {% if request.user.is_authenticated %} hx-target="#app-root" {% endif %}>
+        {% if request.user.is_authenticated %} {% endif %}>
         Transcendance
     </a>
     <!-- TOGGLE -->
@@ -30,30 +31,30 @@
             <ul class="navbar-nav" alt="logo">
                 {% if request.user.is_superuser %}
                 <li>
-                    <a  class="nav-link nav_links text-light" href="/admin/" hx-target="#app-root">Admin</a>
+                    <a  id="nav-admin" class="nav-link nav_links text-light" href="/admin/">Admin</a>
                 </li>
                 {% endif %}
-                <li class="nav-item active">
-                    <a class="nav-link active text-light" href="{% url 'home:welcome' %}" hx-target="#app-root">Home</a>
+                <li class="active">
+                    <a id="nav-home" href="/" class="spa-nav-item nav-link active text-light">Home</a>
                 </li>
-                <li class="nav-item active">
-                    <a  class="nav-link nav_links text-light" href="/play/" hx-target="#app-root">Game</a>
+                <li class="active">
+                    <a  id="nav-play" class="spa-nav-item nav-link nav_links text-light" href="/play/">Game</a>
                 </li>
-                <li class="nav-item active">
-                    <a  class="nav-link nav_links text-light" href="/chatapp/" hx-target="#app-root">Chat</a>
+                <li class="active">
+                    <a  id="nav-chatapp" class="spa-nav-item nav-link nav_links text-light" href="/chatapp/">Chat</a>
                 </li>
-                <li class="nav-item active">
-                    <a  class="nav-link nav_links text-light" href="{% url 'user_stats' %}" hx-target="#app-root">Stats</a>
+                <li class="active">
+                    <a  id="nav-stats" class="spa-nav-item nav-link nav_links text-light" href="{% url 'user_stats' %}">Stats</a>
                 </li>
-                <li class="nav-item active">
-                    <a  class="nav-link nav_links text-light" href="{% url 'accounts:profile' %}{{ request.user.username }}" hx-target="#app-root">Profile</a>
+                <li class="nactive">
+                    <a  id="nav-profile" class="spa-nav-item nav-link nav_links text-light" href="{% url 'accounts:profile' %}{{ request.user.username }}">Profile</a>
                 </li>
             </ul>
         {% endif %}
         <!-- LOGIN/LOGOUT/SIGN-UP -->
         <div class="row_custom ms-0 ms-md-auto">
             {% if request.user.is_authenticated %}
-            <form action="{% url 'accounts:logout' %}" method="post" hx-boost="false" class="sub_menu_link">
+            <form action="{% url 'accounts:logout' %}" method="post" class="sub_menu_link">
                 {% csrf_token %}
                 <button type="submit" class="d-flex align-items-center btn_discrete" style="margin-right: 16px;">
                     <svg style="margin-right: 8px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
@@ -64,17 +65,17 @@
                 </button>
             </form>
             
-            <a class="d-none d-md-block" href="{% url 'accounts:profile' %}{{request.user.username}}" hx-target="#app-root">
-                <img class="user_pic" src="{{ request.user.profile.image.url }}" width="48px" height="48px" alt="profile image">
-            </a>
-    
+            <img
+                class="spa-nav-item user_pic"
+                href="{% url 'accounts:profile' %}{{request.user.username}}"
+                src="{{ request.user.profile.image.url }}"
+                width="48px"
+                height="48px"
+                alt="profile image"
+            >
             {% else %}
-                <a href="{% url 'accounts:login' %}" hx-target="#app-body">
-                    <button class="cta">Log in</button>
-                </a>
-                <a href="{% url 'accounts:signup' %}" hx-target="#app-body">
-                    <button class="cta ms-2">Sign up</button>
-                </a>
+                <button id="nav-login" class="spa-nav-item cta" href="{% url 'accounts:login' %}">Log in</button>
+                <button id="nav-signup" class="spa-nav-item cta ms-2" href="{% url 'accounts:signup' %}">Sign up</button>
             {% endif %}
         </div>
     </div>

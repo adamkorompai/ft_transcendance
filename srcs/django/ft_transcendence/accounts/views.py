@@ -20,16 +20,18 @@ from render_block import render_block_to_string
 from django.middleware.csrf import get_token
 from stats.models import UserStats
 import logging
+import os
 
 
 # get acces to environment variables
 log = logging.getLogger(__name__)
 logging.basicConfig(filename="logs.txt", encoding='utf-8', level=logging.DEBUG)
-load_dotenv()
 
-authorize_uri = "https://api.intra.42.fr/oauth/authorize?\
-	client_id=u-s4t2ud-c6b234d3edfab001ec93a17143651dcef4184d26390c68e82a5d64bd4ea6686e\
-	&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Faccounts%2Fcallback%2F\
+load_dotenv('.env')
+
+authorize_uri = f"https://api.intra.42.fr/oauth/authorize?\
+	client_id={os.getenv('CLIENT_ID')}\
+	&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Faccounts%2Fcallback%2F\
 	&scope=public\
 	&response_type=code\
 	&state="
@@ -57,12 +59,17 @@ def signup_v(request) -> HttpResponse:
             form.save()
             messages.success(request, f'Your account has been created! You are now able to log in.')
             context['form'] = AuthenticationForm()
-            context['title'] = "Login"
-            # must sent whole page otherwise csrf issue
             return render(request, 'accounts/login.html', context)
     else:
         form = UserRegisterForm()
     context['form'] = form
+
+    if "HTTP_SPA_CHECK" in request.META:
+        context['my_csrf'] = get_token(request)
+        html = render_block_to_string('accounts/signup.html', 'body', context)
+        return HttpResponse(json.dumps({
+            "html": html,"title": "Signup"
+        }), content_type="application/json")
 
     return render(request, 'accounts/signup.html', context)
 
@@ -91,6 +98,13 @@ def login_v(request) -> HttpResponse:
     else: # GET request
         form = AuthenticationForm()
     context['form'] = form
+
+    if "HTTP_SPA_CHECK" in request.META:
+        context['my_csrf'] = get_token(request)
+        html = render_block_to_string('accounts/login.html', 'body', context)
+        return HttpResponse(json.dumps({
+            "html": html,"title": "Login"
+        }), content_type="application/json")
     return render(request, 'accounts/login.html', context)
 
 """
@@ -187,7 +201,6 @@ def profile(request, username: str) -> HttpResponse:
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
         context['blocklist'] = displayed_user.profile.blocklist.all()
-        context['title'] = f"{username.capitalize()} (profile)"
 
         try:
             user_stats = UserStats.objects.get(user=displayed_user)
@@ -247,14 +260,19 @@ def profile(request, username: str) -> HttpResponse:
 
     context['show_alerts'] = True
 
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         if request.GET.get('fromEdit', 'False') == 'True':
             return render(request, 'accounts/profile.html', context)
         context['request'] = request
         context['my_csrf'] = get_token(request)
         b_body = render_block_to_string('accounts/profile.html', 'body', context)
         b_script = render_block_to_string('accounts/profile.html', 'script_body', context)
-        return HttpResponse(b_body + b_script)
+        html = b_body + "\n" + b_script
+        return HttpResponse(json.dumps({
+            "html": html,
+            "title": f"{username.capitalize()} (profile)"
+            }),
+            content_type="application/json")
     
     context['request'] = request
     context['my_csrf'] = get_token(request)
@@ -305,10 +323,15 @@ def editprofile(request) -> HttpResponse:
         p_form = ProfileUpdateForm(instance=request.user.profile)
     context['u_form'] = u_form
     context['p_form'] = p_form
-    if 'HTTP_HX_REQUEST' in request.META:
+    if 'HTTP_SPA_CHECK' in request.META:
         context['request'] = request
-        b_body = render_block_to_string('accounts/editprofile.html', 'body', context)
-        return HttpResponse(b_body)
+        context['my_csrf'] = get_token(request)
+        html = render_block_to_string('accounts/editprofile.html', 'body', context)
+        return HttpResponse(json.dumps({
+            "html": html,
+            "title": "Edit Profile"
+            }),
+            content_type="application/json")
     return render(request, 'accounts/editprofile.html', context)
 
 """
@@ -391,6 +414,7 @@ def accept_friend_request(request) -> HttpResponse:
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
                         'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
+                        'my_csrf': get_token(request)
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                 else:
@@ -427,6 +451,7 @@ def decline_friend_request(request) -> HttpResponse:
                         'blocklist': user.profile.blocklist.all(),
                         'is_self': True,
                         'friend_requests': FriendRequest.objects.filter(receiver=user.id, is_active=True),
+                        'my_csrf': get_token(request),
                     }
                     payload['content'] = render_block_to_string('accounts/widget.html', 'content', context)
                     payload['response'] = "Friend request declined"

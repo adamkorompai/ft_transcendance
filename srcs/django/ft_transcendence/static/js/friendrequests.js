@@ -97,7 +97,8 @@ async function acceptFriendRequest(friend_request_id, container, csrf) {
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "X-CSRFToken": csrf
+            "X-CSRFToken": csrf,
+            "html_container": container
         },
         body: JSON.stringify(payload)
     })
@@ -122,12 +123,14 @@ function onFriendRequestAccepted(origin, data) {
     id = container.getAttribute('data-id');
     csrf = container.getAttribute('data-csrf');
     
+    console.log("Origin: ", origin)
     if (origin === "header_status_bar") {
         var unfriend_btn = createUnfriendBtn(id, csrf);
         var dm_btn = createMessageBtn();
         var block_btn = createBlockUnblockBtn(id, "block");
         container.append(unfriend_btn, dm_btn, block_btn);
-    } else { // widget_status_bar
+    } else if (origin === 'widget_status_bar') { // widget_status_bar
+        console.log("MSG: widget section")
         container.innerHTML = data
     }
 }
@@ -144,7 +147,8 @@ async function declineFriendRequest(friend_request_id, origin, csrf) {
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "X-CSRFToken": csrf
+            "X-CSRFToken": csrf,
+            "html_container": origin
         },
         body: JSON.stringify(payload)
     })
@@ -173,7 +177,7 @@ function onFriendRequestDeclined(origin, response_content) {
         var addFriendBtn = createAddFriendBtn(id, csrf);
         var blockBtn = createBlockUnblockBtn(id, "block");
         container.append(addFriendBtn, blockBtn);
-    } else {
+    } else if (origin === 'widget_status_bar') {
         container.innerHTML = response_content
     }
 }
@@ -225,14 +229,12 @@ function onFriendRemoved() {
 ////////////////////////////////////////////////////////////////////////////////
 
 async function blockUnblock(id, action, fromChat) {
-    var status_bar = document.getElementById("header_status_bar");
-    csrf = status_bar.getAttribute("data-csrf")
+    let csrf = document.getElementById("app-body").getAttribute("data-csrf");
     var url = "/accounts/blocking/"
     payload = {
         "user_id": id,
         "action": action
     }
-    console.log(csrf)
     const r = await fetch(url, {
         method: 'POST',
         headers: {
@@ -252,16 +254,17 @@ async function blockUnblock(id, action, fromChat) {
 }
 
 function onBlockedUnblocked(action, fromChat) {
+    if (fromChat === "true") {
+        // redirect to chat page
+        window.location.href = `${url}`;
+    }
     var status_bar = document.getElementById("header_status_bar");
     status_bar.innerHTML = ""
     id = status_bar.getAttribute("data-id");
     csrf = status_bar.getAttribute("data-csrf")
 
-    if (fromChat === "true") {
-        // redirect to global chat page
-        redirectToPage("/chatapp/");
-    }
-    else if (action === "block") {
+    
+    if (action === "block") {
         unblock_btn = createBlockUnblockBtn(id, "unblock");
         status_bar.append(unblock_btn);
     } else {
@@ -269,11 +272,6 @@ function onBlockedUnblocked(action, fromChat) {
         block_btn = createBlockUnblockBtn(id, "block");
         status_bar.append(add_friend_btn, block_btn);
     };
-}
-
-function redirectToPage(url) {
-    const host = window.location.host
-    window.location.href = `${host}${url}`;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
