@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Tournament Details
+{% endblock %}
+
+{% block body %}
+<div class="container_tournament2">
+    <h2>Tournament : {{ tournament.name }}</h2>
+    <p>Number of players: {{ tournament.number_of_players }}</p>
+    
+    {% if tournament.is_started %}
+        <a href="{% url 'tournament_game' tournament_id=tournament.id %}" class="btn btn-primary">Resume Tournament</a>
+    {% else %}
+        <h3>Participants:</h3>
+        <ul>
+            {% for participant in participants %}
+                <li>{{ participant.player.username }}</li>
+            {% endfor %}
+        </ul>
+        <div class="container">
+            {% if user not in participants %}
+                <form method="post" action="{% url 'tournament_signup' tournament.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+            {% else %}
+                <p>You are already signed up for this tournament.</p>
+            {% endif %}
+
+            {% if can_start %}
+                <form method="post" action="{% url 'tournament_start' tournament.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Start Tournament</button>
+                </form>
+            {% else %}
+                {% if is_creator %}
+                    <p>Waiting for more players...</p>
+                {% endif %}
+            {% endif %}
+
+            {% if is_creator %}
+                <form method="post" action="{% url 'tournament_delete' tournament.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Tournament</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
