@@ -154,7 +154,7 @@ Chat
     const roomSlug = "{{ slug }}";
     const roomName = "{{ room_name }}";
     const username = "{{ request.user.username }}";
-    const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/" + roomSlug + "/");
+    const chatSocket = new WebSocket("wss://" + window.location.host + "/ws/chat/" + roomSlug + "/");
   
     chatSocket.onopen = function (e) {
       console.log("The connection was set up successfully!");
