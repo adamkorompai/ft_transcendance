@@ -202,6 +202,7 @@ function endGame(winner) {
             'X-CSRFToken': csrfToken, 
         },
         body: JSON.stringify({
+            tournament_id: 0,
             player1: player1Username,
             player2: player2Username,
             player1_score: leftPaddle.score,
@@ -209,6 +210,7 @@ function endGame(winner) {
             time_played: elapsedTime,
             player1_nb_defense: leftPaddle.defense,
             player2_nb_defense: rightPaddle.defense,
+            winner: winner,
         }),
     })
     .then(response => {

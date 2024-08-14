@@ -85,16 +85,17 @@ def save_game_stats(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         tournament_id = data['tournament_id']
-        winner_username = data['winner']
         
-        tournament = get_object_or_404(Tournament, id=tournament_id)
-        current_match = tournament.get_current_match()
+        if tournament_id != 0:
+            tournament = get_object_or_404(Tournament, id=tournament_id)
+            current_match = tournament.get_current_match()
+            
+            if current_match:
+                winner_username = data['winner']
+                winner = User.objects.get(username=winner_username)
+                current_match.winner = winner
+                current_match.save()
         
-        if current_match:
-            winner = User.objects.get(username=winner_username)
-            current_match.winner = winner
-            current_match.save()
-        data = json.loads(request.body)
         player1_username = data['player1']
         player2_username = data['player2']
         player1_score = data['player1_score']
@@ -104,60 +105,50 @@ def save_game_stats(request):
         player2_nb_defense = data['player2_nb_defense']
 
         player1 = User.objects.get(username=player1_username)
+        player2 = User.objects.get(username=player2_username)
+        
         player1_stats, _ = UserStats.objects.get_or_create(user=player1)
         player1_stats.total_games += 1
         player1_stats.goals_scored += player1_score
         player1_stats.goals_conceded += player2_score
         player1_stats.time_played += time_played
         player1_stats.nb_defense += player1_nb_defense
+        player1_stats.match_history.append({
+            'opponent': player2_username,
+            'user_score': player1_score,
+            'opponent_score': player2_score,
+            'opponent_profile_image': player2.profile.image.url
+        })
 
         if player1_score > player2_score:
             player1_stats.wins += 1
         else:
             player1_stats.losses += 1
-
-        if player2_username:
-            player2 = User.objects.get(username=player2_username)
-            player2_profile_image = player2.profile.image.url
-        else:
-            player2_profile_image = None
-
-        match_data = {
-            'opponent': player2_username,
-            'user_score': player1_score,
-            'opponent_score': player2_score,
-            'opponent_profile_image': player2_profile_image
-        }
-        player1_stats.match_history.append(match_data)
         player1_stats.save()
 
-        if player2_username:
-            player2_stats, _ = UserStats.objects.get_or_create(user=player2)
-            player2_stats.total_games += 1
-            player2_stats.goals_scored += player2_score
-            player2_stats.goals_conceded += player1_score
-            player2_stats.time_played += time_played
-            player2_stats.nb_defense += player2_nb_defense
+        player2_stats, _ = UserStats.objects.get_or_create(user=player2)
+        player2_stats.total_games += 1
+        player2_stats.goals_scored += player2_score
+        player2_stats.goals_conceded += player1_score
+        player2_stats.time_played += time_played
+        player2_stats.nb_defense += player2_nb_defense
+        player2_stats.match_history.append({
+            'opponent': player1_username,
+            'user_score': player2_score,
+            'opponent_score': player1_score,
+            'opponent_profile_image': player1.profile.image.url
+        })
 
-            if player2_score > player1_score:
-                player2_stats.wins += 1
-            else:
-                player2_stats.losses += 1
-
-            player1_profile_image = player1.profile.image.url
-
-            match_data_player2 = {
-                'opponent': player1_username,
-                'user_score': player2_score,
-                'opponent_score': player1_score,
-                'opponent_profile_image': player1_profile_image
-            }
-            player2_stats.match_history.append(match_data_player2)
-            player2_stats.save()
+        if player2_score > player1_score:
+            player2_stats.wins += 1
+        else:
+            player2_stats.losses += 1
+        player2_stats.save()
 
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error'})
+
 
 @login_required(login_url='/accounts/login/?redirected=true')
 def save_ia_game_stats(request):

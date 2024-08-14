@@ -18,14 +18,12 @@
 	<body hx-headers='{"X-CSRFToken": "{% csrf_token %}"}' id="app-body">
 		{% include './nav.html' %}
 		<main id="app-root">
-			{% if show_alerts %}
-				{% if messages %}
-					{% for message in messages %}
-						<div class="alert alert-{{message.tags}}">
-							{{ message | safe }}
-						</div>
-					{% endfor %}
-				{% endif %}
+			{% if messages %}
+				{% for message in messages %}
+					<div class="alert alert-{{message.tags}}">
+						{{ message | safe }}
+					</div>
+				{% endfor %}
 			{% endif %}
 			{% block body %}{% endblock %}
 		</main>
