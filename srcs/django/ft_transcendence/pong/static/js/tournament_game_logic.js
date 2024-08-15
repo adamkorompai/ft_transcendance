@@ -54,7 +54,7 @@ class TournamentPongGame {
     }
 
     keyDownHandler(e) {
-        if (e.key === 'z') this.zPressed = true;
+        if (e.key === 'w') this.zPressed = true;
         else if (e.key === 's') this.sPressed = true;
         else if (e.key === 'ArrowUp') this.upPressed = true;
         else if (e.key === 'ArrowDown') this.downPressed = true;
