@@ -54,7 +54,7 @@ class TournamentPongGame {
     }
 
     keyDownHandler(e) {
-        if (e.key === 'w') this.zPressed = true;
+        if (e.key === 'z') this.zPressed = true;
         else if (e.key === 's') this.sPressed = true;
         else if (e.key === 'ArrowUp') this.upPressed = true;
         else if (e.key === 'ArrowDown') this.downPressed = true;
@@ -109,8 +109,8 @@ class TournamentPongGame {
 
     update() {
         // Move paddles
-        if (this.zPressed && this.leftPaddle.y > 0) this.leftPaddle.y -= this.paddleSpeed;
-        else if (this.sPressed && this.leftPaddle.y < this.canvas.height - this.leftPaddle.height) this.leftPaddle.y += this.paddleSpeed;
+        if (this.sPressed && this.leftPaddle.y > 0) this.leftPaddle.y -= this.paddleSpeed;
+        else if (this.zPressed && this.leftPaddle.y < this.canvas.height - this.leftPaddle.height) this.leftPaddle.y += this.paddleSpeed;
         if (this.upPressed && this.rightPaddle.y > 0) this.rightPaddle.y -= this.paddleSpeed;
         else if (this.downPressed && this.rightPaddle.y < this.canvas.height - this.rightPaddle.height) this.rightPaddle.y += this.paddleSpeed;
 
