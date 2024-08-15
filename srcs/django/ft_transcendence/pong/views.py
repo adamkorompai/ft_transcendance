@@ -240,7 +240,7 @@ def tournament_start(request, tournament_id):
 
     if request.method == 'POST' and tournament.is_ready_to_start() and not tournament.is_started and tournament.creator == request.user:
         tournament.start()
-        messages.success(request, 'Tournament has started!')
+        # messages.success(request, 'Tournament has started!')
         return redirect('tournament_game', tournament_id=tournament.id)
     else:
         if not tournament.is_ready_to_start():
@@ -265,7 +265,7 @@ def tournament_signup(request, tournament_id):
             messages.error(request, 'You are already signed up for this tournament.')
         else:
             TournamentParticipant.objects.create(tournament=tournament, player=request.user)
-            messages.success(request, 'You have successfully signed up for the tournament.')
+            #messages.success(request, 'You have successfully signed up for the tournament.')
     return redirect('tournament_detail', tournament_id=tournament.id)
 
 @login_required(login_url='/accounts/login/?redirected=true')
@@ -280,11 +280,12 @@ def tournament_game(request, tournament_id):
     context = {
         'tournament': tournament,
         'current_match': current_match,
+        'show_alerts': True
     }
     return render(request, 'tournament_game.html', context)
 
 @login_required(login_url='/accounts/login/?redirected=true')    
-def tournament_delete(request, tournament_id):
+def tournament_delete(request, tournament_id) -> HttpResponse:
     tournament = get_object_or_404(Tournament, id=tournament_id)
 
     # ctrl si l'user est le createur du tournoi
@@ -299,7 +300,7 @@ def tournament_delete(request, tournament_id):
 
     # del le tournoi
     tournament.delete()
-    messages.success(request, "Tournament has been deleted successfully.")
+    #messages.success(request, "Tournament has been deleted successfully.")
     return redirect('tournaments')
 
 @login_required(login_url='/accounts/login/?redirected=true')

@@ -247,10 +247,10 @@ function nextGame() {
             
             // alert(`Next match: ${data.player1} vs ${data.player2}`);
         } else if (data.error === 'Tournament finished') {
-            alert(`Le tournoi est terminé ! Le gagnant est ${data.winner} !`);
+            alert(`Tournament is over ! Winner is ${data.winner} !`);
             window.location.href = "/play/tournaments/";
         } else {
-            alert("Une erreur s'est produite lors de la récupération du prochain match.");
+            alert("An error occurred while retrieving the next match.");
             window.location.href = "/play/tournaments/";
         }
     })
