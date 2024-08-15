@@ -217,7 +217,7 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Définir le drapeau de but marqué
             leftPaddle.score++;
-            if (leftPaddle.score >= 1) {
+            if (leftPaddle.score >= 3) {
                 endGame(player1Username);
             } else {
                 setTimeout(function() {
@@ -231,7 +231,7 @@ function update() {
         if (!goalScored) {
             goalScored = true; // Définir le drapeau de but marqué
             rightPaddle.score++;
-            if (rightPaddle.score >= 1) {
+            if (rightPaddle.score >= 3) {
                 endGame('Pong GPT');
             } else {
                 setTimeout(function() {
