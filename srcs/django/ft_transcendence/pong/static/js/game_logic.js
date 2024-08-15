@@ -68,7 +68,7 @@ function stopTimer() {
 }
 
 function keyDownHandler(e) {
-    if (e.key === 'w') {
+    if (e.key === 'z') {
         zPressed = true;
     } else if (e.key === 's') {
         sPressed = true;
@@ -112,9 +112,9 @@ function drawBall() {
 // Update game elements
 function update() {
     // Move the paddles
-    if (zPressed && leftPaddle.y > 0) {
+    if (sPressed && leftPaddle.y > 0) {
         leftPaddle.y -= paddleSpeed;
-    } else if (sPressed && leftPaddle.y < canvas.height - leftPaddle.height) {
+    } else if (zPressed && leftPaddle.y < canvas.height - leftPaddle.height) {
         leftPaddle.y += paddleSpeed;
     }
     if (upPressed && rightPaddle.y > 0) {
