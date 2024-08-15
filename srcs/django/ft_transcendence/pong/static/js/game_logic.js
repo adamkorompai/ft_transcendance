@@ -68,7 +68,7 @@ function stopTimer() {
 }
 
 function keyDownHandler(e) {
-    if (e.key === 'z') {
+    if (e.key === 'w') {
         zPressed = true;
     } else if (e.key === 's') {
         sPressed = true;
