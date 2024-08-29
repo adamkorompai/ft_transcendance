@@ -224,6 +224,18 @@ class TournamentPongGame {
     }
 }
 
+function updateMatchDisplay(matches) {
+    const matchList = document.querySelector('.list-group');
+    matchList.innerHTML = '';
+    matches.forEach((match, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = `${match.player1} vs ${match.player2 || 'TBD'}`;
+        if (index === 0) li.classList.add('active');
+        matchList.appendChild(li);
+    });
+}
+
 function nextGame() {
     fetch(`/play/tournaments/${tournamentId}/next-match/`, {
         method: 'GET',
@@ -244,10 +256,9 @@ function nextGame() {
             document.getElementById('startGameButton').style.display = 'block';
             
             updatePlayerDisplay(data.player1, data.player2);
-            
-            // alert(`Next match: ${data.player1} vs ${data.player2}`);
+            updateMatchDisplay(data.current_round_matches);
         } else if (data.error === 'Tournament finished') {
-            alert(`Tournament is over ! Winner is ${data.winner} !`);
+            alert(`Tournament is over! Winner is ${data.winner}!`);
             window.location.href = "/play/tournaments/";
         } else {
             alert("An error occurred while retrieving the next match.");

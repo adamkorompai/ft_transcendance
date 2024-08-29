@@ -18,6 +18,7 @@ class Profile(models.Model):
     description = models.CharField(default=pick_random_description())
     blocklist = models.ManyToManyField(User, blank=True, related_name="blocklist")
     userstats = models.OneToOneField(UserStats, on_delete=models.SET_NULL, null=True, blank=True)
+    alias = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -30,6 +31,10 @@ class Profile(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+    
+    def reset_alias(self):
+        self.alias = None
+        self.save()
 
 class FriendList(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user")

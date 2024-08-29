@@ -13,6 +13,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Tournament, TournamentParticipant, TournamentMatch
 from . import views
+from datetime import timedelta
+from django.utils import timezone
 
 # Create your views here.
 @login_required(login_url='/accounts/login/?redirected=true')
@@ -106,6 +108,8 @@ def save_game_stats(request):
 
         player1 = User.objects.get(username=player1_username)
         player2 = User.objects.get(username=player2_username)
+
+        match_date = timezone.now() + timedelta(hours=2)
         
         player1_stats, _ = UserStats.objects.get_or_create(user=player1)
         player1_stats.total_games += 1
@@ -117,7 +121,10 @@ def save_game_stats(request):
             'opponent': player2_username,
             'user_score': player1_score,
             'opponent_score': player2_score,
-            'opponent_profile_image': player2.profile.image.url
+            'opponent_profile_image': player2.profile.image.url,
+            'date': match_date.strftime('%d-%m-%Y %H:%M:%S'),
+            'defense': player1_nb_defense,
+            'game_time': time_played
         })
 
         if player1_score > player2_score:
@@ -136,7 +143,10 @@ def save_game_stats(request):
             'opponent': player1_username,
             'user_score': player2_score,
             'opponent_score': player1_score,
-            'opponent_profile_image': player1.profile.image.url
+            'opponent_profile_image': player1.profile.image.url,
+            'date': match_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'defense': player2_nb_defense,
+            'game_time': time_played
         })
 
         if player2_score > player1_score:
@@ -173,6 +183,8 @@ def save_ia_game_stats(request):
         player_stats.time_played += time_played
         player_stats.nb_defense += player_nb_defense
 
+        match_date = timezone.now() + timedelta(hours=2)
+
         if player_score > ia_score:
             player_stats.wins += 1
         else:
@@ -181,7 +193,11 @@ def save_ia_game_stats(request):
         match_data = {
             'opponent': 'Pong GPT',
             'user_score': player_score,
-            'opponent_score': ia_score
+            'opponent_score': ia_score,
+            'date': match_date.strftime('%d-%m-%Y %H:%M:%S'),
+            'defense': player_nb_defense,
+            'game_time': time_played
+
         }
         player_stats.match_history.append(match_data)
 
@@ -276,10 +292,13 @@ def tournament_game(request, tournament_id):
     if not current_match and not tournament.is_finished:
         tournament.create_next_round()
         current_match = tournament.get_current_match()
+        
+    current_round_matches = tournament.get_current_round_matches()
 
     context = {
         'tournament': tournament,
         'current_match': current_match,
+        'current_round_matches': current_round_matches,
         'show_alerts': True
     }
     return render(request, 'tournament_game.html', context)
@@ -310,7 +329,7 @@ def submit_match_result(request, tournament_id):
         return JsonResponse({'success': True})
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
-@login_required(login_url='/accounts/login/?redirected=true')
+@login_required(login_url='/accounts/login/?redirected=true')  
 def get_next_match(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     next_match = tournament.get_current_match()
@@ -319,16 +338,20 @@ def get_next_match(request, tournament_id):
         if tournament.create_next_round():
             next_match = tournament.get_current_match()
         else:
-            # Le tournoi est terminé
             winner = tournament.winner.username if tournament.winner else "Unknown"
             tournament.delete()
             return JsonResponse({'success': False, 'error': 'Tournament finished', 'winner': winner})
     
     if next_match:
+        current_round_matches = [
+            {'player1': match.player1.username, 'player2': match.player2.username if match.player2 else None}
+            for match in tournament.get_current_round_matches()
+        ]
         return JsonResponse({
             'success': True,
             'player1': next_match.player1.username,
             'player2': next_match.player2.username if next_match.player2 else None,
+            'current_round_matches': current_round_matches,
         })
     else:
         return JsonResponse({'success': False, 'error': 'No more matches'})

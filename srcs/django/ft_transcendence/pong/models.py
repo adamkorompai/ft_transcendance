@@ -17,6 +17,12 @@ class Tournament(models.Model):
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='won_tournaments')
     is_finished = models.BooleanField(default=False)
 
+    def get_current_round_matches(self):
+        return TournamentMatch.objects.filter(
+            tournament=self,
+            round_number=self.current_round
+        ).order_by('id')
+
     def create_next_round(self):
         current_round_matches = TournamentMatch.objects.filter(
             tournament=self,

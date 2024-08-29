@@ -185,7 +185,7 @@
 	<!-- partie historique match -->
 	<div class="d-flex flex-column flex-md-row">
 		<section class="w-auto __bg-secondary p-3 rounded-2" style="min-width: 508px;">
-			<h3>Match History</h3>
+			<h3>Match History Dashboard</h3>
 			{% if user_stats %}
 				<div style="display: grid; grid-template-columns: auto 40px 130px 40px auto; gap: 10px;">
 					{% for match in user_stats.match_history %}
@@ -222,6 +222,12 @@
 					{% else %}
 						<div>IA Game</div>
 					{% endif %}
+					<!-- Ajout de la date du match -->
+					<div style="grid-column: span 5; text-align: center;">
+						<small>
+							{{ match.date }} | Defense: {{ match.defense }} | Time Played: {{ match.game_time }} sec
+						</small>
+					</div>
 					{% endfor %}
 				</div>
 			{% else %}
