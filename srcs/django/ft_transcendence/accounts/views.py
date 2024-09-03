@@ -201,6 +201,7 @@ def profile(request, username: str) -> HttpResponse:
         context['description'] = displayed_user.profile.description
         context['all_users'] = User.objects.all()
         context['blocklist'] = displayed_user.profile.blocklist.all()
+        context['profile'] = displayed_user.profile
 
         try:
             user_stats = UserStats.objects.get(user=displayed_user)

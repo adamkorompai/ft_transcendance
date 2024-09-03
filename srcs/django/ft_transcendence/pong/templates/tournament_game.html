@@ -16,11 +16,11 @@
             <div class="player-info d-flex justify-content-between mb-3">
                 <div class="player d-flex flex-column align-items-center">
                     <img src="{{ current_match.player1.profile.image.url }}" alt="Player 1" class="rounded-circle" style="width: 100px; height: 100px;">
-                    <span class="mt-2">{{ current_match.player1.username }}</span>
+                    <span class="mt-2">{{ current_match.player1.username }} Alias {{ current_match.player1.profile.alias }}</span>
                 </div>
                 <div class="player d-flex flex-column align-items-center">
                     <img src="{{ current_match.player2.profile.image.url }}" alt="Player 2" class="rounded-circle" style="width: 100px; height: 100px;">
-                    <span class="mt-2">{{ current_match.player2.username }}</span>
+                    <span class="mt-2">{{ current_match.player2.username }} Alias {{ current_match.player2.profile.alias }}</span>
                 </div>
             </div>
             <div class="game-container2 d-flex justify-content-center mb-4">
@@ -43,7 +43,7 @@
             <ul class="list-group">
                 {% for match in current_round_matches %}
                     <li class="list-group-item text-center">
-                        {{ match.player1.username }} vs {% if match.player2 %}{{ match.player2.username }}{% else %}TBD{% endif %}
+                        {{ match.player1.username }} Alias {{ match.player1.profile.alias }} vs {% if match.player2 %}{{ match.player2.username }} Alias {{ match.player2.profile.alias }}{% else %}TBD{% endif %}
                     </li>
                 {% endfor %}
             </ul>

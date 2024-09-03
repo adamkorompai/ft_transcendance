@@ -9,7 +9,8 @@
 <div class="container_tournament">
     <h1>Tournaments</h1>
 </div>
-<h4>create Tournaments :</h4>
+{% if not tournaments %}
+    <h4>Create Tournament:</h4>
     <form action="{% url 'create_tournament' %}" method="post">
         {% csrf_token %}
         <label for="tournament_name">Tournament Name:</label>
@@ -24,6 +25,11 @@
         
         <button type="submit" class="btn btn-primary">Create Tournament</button>
     </form>
+    <hr>
+{% else %}
+    <p>A tournament is already ongoing. Please finish it before creating a new one.</p>
+    <hr>
+{% endif %}
 
     <hr>
 

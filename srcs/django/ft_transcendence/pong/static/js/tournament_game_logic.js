@@ -108,22 +108,18 @@ class TournamentPongGame {
     }
 
     update() {
-        // Move paddles
         if (this.sPressed && this.leftPaddle.y > 0) this.leftPaddle.y -= this.paddleSpeed;
         else if (this.zPressed && this.leftPaddle.y < this.canvas.height - this.leftPaddle.height) this.leftPaddle.y += this.paddleSpeed;
         if (this.upPressed && this.rightPaddle.y > 0) this.rightPaddle.y -= this.paddleSpeed;
         else if (this.downPressed && this.rightPaddle.y < this.canvas.height - this.rightPaddle.height) this.rightPaddle.y += this.paddleSpeed;
 
-        // Move ball
         this.ball.x += this.ball.dx;
         this.ball.y += this.ball.dy;
 
-        // Wall collisions
         if (this.ball.y + this.ball.dy > this.canvas.height - this.ball.radius || this.ball.y + this.ball.dy < this.ball.radius) {
             this.ball.dy = -this.ball.dy;
         }
 
-        // Paddle collisions
         if (this.ball.x + this.ball.dx > this.rightPaddle.x && this.ball.x + this.ball.dx < this.rightPaddle.x + this.rightPaddle.width &&
             this.ball.y > this.rightPaddle.y && this.ball.y < this.rightPaddle.y + this.rightPaddle.height) {
             this.ball.dx = -this.ball.dx;
@@ -136,7 +132,6 @@ class TournamentPongGame {
             this.leftPaddle.defense++;
         }
 
-        // Scoring
         if (this.ball.x + this.ball.radius > this.canvas.width) {
             if (!this.goalScored) {
                 this.goalScored = true;
@@ -229,9 +224,8 @@ function updateMatchDisplay(matches) {
     matchList.innerHTML = '';
     matches.forEach((match, index) => {
         const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = `${match.player1} vs ${match.player2 || 'TBD'}`;
-        if (index === 0) li.classList.add('active');
+        li.className = 'list-group-item text-center';
+        li.textContent = `${match.player1.username} Alias (${match.player1.alias}) vs ${match.player2 ? match.player2.username + ' Alias (' + match.player2.alias + ')' : 'TBD'}`;
         matchList.appendChild(li);
     });
 }
@@ -247,15 +241,18 @@ function nextGame() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            player1Username = data.player1;
-            player2Username = data.player2;
+            const player1Data = data.player1;
+            const player2Data = data.player2;
+
+            player1Username = player1Data.username;
+            player2Username = player2Data ? player2Data.username : null;
             
             game = new TournamentPongGame(document.getElementById('pongCanvas'));
-            
+
             document.getElementById('nextGameButton').style.display = 'none';
             document.getElementById('startGameButton').style.display = 'block';
             
-            updatePlayerDisplay(data.player1, data.player2);
+            updatePlayerDisplay(player1Data, player2Data);
             updateMatchDisplay(data.current_round_matches);
         } else if (data.error === 'Tournament finished') {
             alert(`Tournament is over! Winner is ${data.winner}!`);
@@ -270,23 +267,21 @@ function nextGame() {
     });
 }
 
-// Fonction pour mettre à jour l'affichage des joueurs
-function updatePlayerDisplay(player1, player2) {
+function updatePlayerDisplay(player1Data, player2Data) {
     const player1Element = document.querySelector('.player:nth-child(1)');
     const player2Element = document.querySelector('.player:nth-child(2)');
 
-    player1Element.querySelector('span').textContent = player1;
-    player2Element.querySelector('span').textContent = player2 || "Guest Player";
+    player1Element.querySelector('span').textContent = `${player1Data.username} Alias (${player1Data.alias})`;
+    player2Element.querySelector('span').textContent = player2Data ? `${player2Data.username} Alias (${player2Data.alias})` : "Guest Player";
 
-    // Mise à jour des images
-    fetch(`/play/check-user/${player1}/`)
+    fetch(`/play/check-user/${player1Data.username}/`)
         .then(response => response.json())
         .then(data => {
             player1Element.querySelector('img').src = data.profile_image;
         });
 
-    if (player2) {
-        fetch(`/play/check-user/${player2}/`)
+    if (player2Data) {
+        fetch(`/play/check-user/${player2Data.username}/`)
             .then(response => response.json())
             .then(data => {
                 player2Element.querySelector('img').src = data.profile_image;

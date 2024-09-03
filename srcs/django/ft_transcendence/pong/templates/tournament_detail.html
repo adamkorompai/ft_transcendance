@@ -15,17 +15,17 @@
         <h3>Participants:</h3>
         <ul>
             {% for participant in participants %}
-                <li>{{ participant.player.username }}</li>
+                <li>{{ participant.player.username }} ({{ participant.player.profile.alias }})</li>
             {% endfor %}
         </ul>
         <div class="container">
-            {% if user not in participants %}
+            {% if user not in participants and user.profile.alias%}
                 <form method="post" action="{% url 'tournament_signup' tournament.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Sign Up</button>
                 </form>
             {% else %}
-                <p>You are already signed up for this tournament.</p>
+                <p>You are not set your alias to join this tournament.</p>
             {% endif %}
 
             {% if can_start %}

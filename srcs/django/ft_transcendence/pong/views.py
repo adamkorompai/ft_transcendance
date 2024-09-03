@@ -16,7 +16,6 @@ from . import views
 from datetime import timedelta
 from django.utils import timezone
 
-# Create your views here.
 @login_required(login_url='/accounts/login/?redirected=true')
 def pong_game(request):
     if request.method == 'POST':
@@ -224,11 +223,15 @@ def create_tournament(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         number_of_players = request.POST.get('number_of_players')
-        # Récupérer l'utilisateur actuel pour après ctrl le createur
         creator = request.user
-        # Creation du tournoi
+
+        players = User.objects.all()
+        for player in players:
+            player.profile.alias = ''
+            player.profile.save()
         Tournament.objects.create(name=name, number_of_players=number_of_players, creator=creator)
         return redirect('tournaments')
+
     return render(request, 'tournaments.html')
 
 @login_required(login_url='/accounts/login/?redirected=true')
@@ -333,7 +336,7 @@ def submit_match_result(request, tournament_id):
 def get_next_match(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     next_match = tournament.get_current_match()
-    
+
     if not next_match:
         if tournament.create_next_round():
             next_match = tournament.get_current_match()
@@ -341,16 +344,31 @@ def get_next_match(request, tournament_id):
             winner = tournament.winner.username if tournament.winner else "Unknown"
             tournament.delete()
             return JsonResponse({'success': False, 'error': 'Tournament finished', 'winner': winner})
-    
+
     if next_match:
         current_round_matches = [
-            {'player1': match.player1.username, 'player2': match.player2.username if match.player2 else None}
+            {
+                'player1': {
+                    'username': match.player1.username,
+                    'alias': match.player1.profile.alias,
+                },
+                'player2': {
+                    'username': match.player2.username,
+                    'alias': match.player2.profile.alias,
+                } if match.player2 else None
+            }
             for match in tournament.get_current_round_matches()
         ]
         return JsonResponse({
             'success': True,
-            'player1': next_match.player1.username,
-            'player2': next_match.player2.username if next_match.player2 else None,
+            'player1': {
+                'username': next_match.player1.username,
+                'alias': next_match.player1.profile.alias,
+            },
+            'player2': {
+                'username': next_match.player2.username,
+                'alias': next_match.player2.profile.alias,
+            } if next_match.player2 else None,
             'current_round_matches': current_round_matches,
         })
     else:
