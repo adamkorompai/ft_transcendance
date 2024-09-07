@@ -1,3 +1,4 @@
+#!/bin/bash
 
 DB_HOST="db"
 DB_PORT="5432"
@@ -21,8 +22,8 @@ if [ $? -eq 0 ]; then
 	python3 -m pip install daphne;
 	python3 manage.py makemigrations;
 	python3 manage.py migrate;
-	# python3 manage.py runsslserver --certificate ../../../certificates/cert.pem --key ../../../certificates/key.pem 0.0.0.0:8000;
-	# python3 manage.py runsslserver 0.0.0.0:8000;
+	python3 manage.py collectstatic;
+	service nginx start
 	daphne -e ssl:8000:privateKey=../../../certificates/key.pem:certKey=../../../certificates/cert.pem ft_transcendence.asgi:application
 else
     echo "Échec de la connexion à la base de données PostgreSQL.";
