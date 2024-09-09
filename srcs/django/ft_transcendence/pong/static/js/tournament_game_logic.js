@@ -271,8 +271,8 @@ function updatePlayerDisplay(player1Data, player2Data) {
     const player1Element = document.querySelector('.player:nth-child(1)');
     const player2Element = document.querySelector('.player:nth-child(2)');
 
-    player1Element.querySelector('span').textContent = `${player1Data.username} Alias (${player1Data.alias})`;
-    player2Element.querySelector('span').textContent = player2Data ? `${player2Data.username} Alias (${player2Data.alias})` : "Guest Player";
+    player1Element.querySelector('span').textContent = `${player1Data.username} Alias ${player1Data.alias}`;
+    player2Element.querySelector('span').textContent = player2Data ? `${player2Data.username} Alias ${player2Data.alias}` : "Guest Player";
 
     fetch(`/play/check-user/${player1Data.username}/`)
         .then(response => response.json())

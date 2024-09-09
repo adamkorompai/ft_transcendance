@@ -92,9 +92,7 @@ def login_v(request) -> HttpResponse:
             user = form.get_user()
             user.profile.active = True
             login(request, user)
-            context['all_users'] = User.objects.all()
-            context['title'] = "Home"
-            return render(request, 'welcome.html', context) # target=app-body
+            return redirect('home:welcome')
     else: # GET request
         form = AuthenticationForm()
     context['form'] = form

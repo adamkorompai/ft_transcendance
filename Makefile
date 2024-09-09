@@ -22,8 +22,8 @@ reset: fclean
 	rm -rf ./srcs/data
 	find . -type d -name '__pycache__' -exec rm -r {} +
 	rm -rf ./srcs/django/ft_transcendence/threejs
-
-# rm -rf ./srcs/certificates
+	rm -rf ./srcs/django/ft_transcendence/staticfiles
+	rm -rf ./srcs/certificates/*.*
 
 re: fclean all
 
