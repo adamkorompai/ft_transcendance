@@ -21,9 +21,11 @@ fclean: clean
 reset: fclean
 	rm -rf ./srcs/data
 	find . -type d -name '__pycache__' -exec rm -r {} +
+	find . -path "*/migrations/*.py" -not -name "__init__.py" -exec rm -f {} +
 	rm -rf ./srcs/django/ft_transcendence/threejs
 	rm -rf ./srcs/django/ft_transcendence/staticfiles
 	rm -rf ./srcs/certificates/*.*
+	rm -rf staticfiles
 
 re: fclean all
 
