@@ -37,6 +37,7 @@ let rightPaddle = {
 let goalScored = false; // Variable pour suivre si un but a été marqué
 let goalTime = 2000; // 2 secondes en millisecondes
 
+
 // Définir le pourcentage de chance que l'IA fasse une erreur
 const errorChance = 0.2; // 20%
 
@@ -96,10 +97,10 @@ function updateAIPaddle() {
     const currentTime = Date.now();
     const deltaTime = (currentTime - lastAIUpdate) / 1000; // Temps écoulé en secondes
     lastAIUpdate = currentTime;
-
+    
     // Décider aléatoirement si l'IA fera une erreur
     const hasError = Math.random() < errorChance;
-
+    
     if (hasError) {
         // Comportement erroné : l'IA se déplace de manière aléatoire ou reste immobile
         if (Math.random() < 0.5) {
@@ -118,17 +119,17 @@ function updateAIPaddle() {
         while (futureBallX < rightPaddle.x && futureBallX + ballDirectionX > rightPaddle.x) {
             futureBallY += ballDirectionY;
             futureBallX += ballDirectionX;
-
+            
             // Gestion des rebonds sur les murs
             if (futureBallY + ball.radius > canvas.height || futureBallY - ball.radius < 0) {
                 ballDirectionY = -ballDirectionY; // Inverser la direction de la balle en y
             }
         }
-
+        
         // Vérifiez si le paddle droit est déjà aligné avec la position future de la balle
         const paddleCenter = rightPaddle.y + rightPaddle.height / 2;
         const threshold = IApaddleSpeed * deltaTime; // Marge d'erreur basée sur le temps écoulé
-
+        
         if (Math.abs(paddleCenter - futureBallY) < threshold) {
             rightPaddle.dy = 0; // Arrêter le paddle
         } else if (paddleCenter > futureBallY) {
@@ -141,7 +142,7 @@ function updateAIPaddle() {
             }
         }
     }
-
+    
     // Assurer que le paddle reste dans les limites du canvas
     if (rightPaddle.y < 0) rightPaddle.y = 0;
     if (rightPaddle.y + rightPaddle.height > canvas.height) {
@@ -156,6 +157,14 @@ function drawPaddles() {
     ctx.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
     // Paddle droit
     ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+}
+
+// Fonction pour dessiner score
+function drawScores() {
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(leftPaddle.score.toString(), canvas.width / 2 - 50, 30);
+    ctx.fillText(rightPaddle.score.toString(), canvas.width / 2 + 30, 30);
 }
 
 // Fonction pour dessiner la balle
@@ -175,10 +184,10 @@ function update() {
     } else if (zPressed && leftPaddle.y < canvas.height - leftPaddle.height) {
         leftPaddle.y += paddleSpeed;
     }
-
+    
     // Déplacer paddle de l'IA
     updateAIPaddle();
-
+    
     // Déplacer la balle
     ball.x += ball.dx;
     ball.y += ball.dy;
@@ -187,7 +196,7 @@ function update() {
     if (ball.y + ball.dy > canvas.height - ball.radius || ball.y + ball.dy < ball.radius) {
         ball.dy = -ball.dy;
     }
-
+    
     // Détection de collision avec les paddles
     if (
         ball.x + ball.dx > rightPaddle.x &&
@@ -195,42 +204,42 @@ function update() {
         ball.y > rightPaddle.y &&
         ball.y < rightPaddle.y + rightPaddle.height &&
         ball.x + ball.radius > rightPaddle.x
-    ) {
-        ball.dx = -ball.dx;
-        ball.dy = (Math.random() - 0.5) * 6;
-        rightPaddle.defense++;
-    } else if (
-        ball.x + ball.dx < leftPaddle.x + leftPaddle.width &&
-        ball.x + ball.dx > leftPaddle.x &&
-        ball.y > leftPaddle.y &&
-        ball.y < leftPaddle.y + leftPaddle.height &&
-        ball.x - ball.radius < leftPaddle.x + leftPaddle.width
-    ) {
-        ball.dx = -ball.dx;
-        ball.dy = (Math.random() - 0.5) * 6;
-        leftPaddle.defense++;
-    }
-
-    // Vérifier si un but a été marqué (balle passée les paddles)
-    if (ball.x + ball.radius > canvas.width) {
-        // Joueur 1 (gauche) marque
-        if (!goalScored) {
-            goalScored = true; // Définir le drapeau de but marqué
-            leftPaddle.score++;
-            if (leftPaddle.score >= 3) {
-                endGame(player1Username);
-            } else {
-                setTimeout(function() {
-                    resetBall();
-                    goalScored = false; // Réinitialiser le drapeau de but marqué après 2 secondes
-                }, goalTime);
+        ) {
+            ball.dx = -ball.dx;
+            ball.dy = (Math.random() - 0.5) * 6;
+            rightPaddle.defense++;
+        } else if (
+            ball.x + ball.dx < leftPaddle.x + leftPaddle.width &&
+            ball.x + ball.dx > leftPaddle.x &&
+            ball.y > leftPaddle.y &&
+            ball.y < leftPaddle.y + leftPaddle.height &&
+            ball.x - ball.radius < leftPaddle.x + leftPaddle.width
+            ) {
+                ball.dx = -ball.dx;
+                ball.dy = (Math.random() - 0.5) * 6;
+                leftPaddle.defense++;
             }
-        }
-    } else if (ball.x - ball.radius < 0) {
-        // Joueur 2 (droit) marque
-        if (!goalScored) {
-            goalScored = true; // Définir le drapeau de but marqué
-            rightPaddle.score++;
+            
+            // Vérifier si un but a été marqué (balle passée les paddles)
+            if (ball.x + ball.radius > canvas.width) {
+                // Joueur 1 (gauche) marque
+                if (!goalScored) {
+                    goalScored = true; // Définir le drapeau de but marqué
+                    leftPaddle.score++;
+                    if (leftPaddle.score >= 3) {
+                        endGame(player1Username);
+                    } else {
+                        setTimeout(function() {
+                            resetBall();
+                            goalScored = false; // Réinitialiser le drapeau de but marqué après 2 secondes
+                        }, goalTime);
+                    }
+                }
+            } else if (ball.x - ball.radius < 0) {
+                // Joueur 2 (droit) marque
+                if (!goalScored) {
+                    goalScored = true; // Définir le drapeau de but marqué
+                    rightPaddle.score++;
             if (rightPaddle.score >= 3) {
                 endGame('Pong GPT');
             } else {
@@ -248,9 +257,9 @@ function endGame(winner) {
     stopTimer();
     clearInterval(gameLoop);
     clearInterval(aiUpdateInterval); // Arrêter la mise à jour de l'IA
-
+    
     alert(`Game Over! ${winner} wins!`);
-
+    
     // Save des stats du jeu
     fetch('/play/save-ia-game-stats/', {
         method: 'POST',
@@ -284,6 +293,7 @@ function resetBall() {
 }
 
 function drawMiddleLine() {
+    console.log("drawScores() called");
     ctx.beginPath();
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
