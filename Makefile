@@ -24,6 +24,7 @@ reset: fclean
 	find . -path "*/migrations/*.py" -not -name "__init__.py" -exec rm -f {} +
 	rm -rf ./srcs/django/ft_transcendence/threejs
 	rm -rf ./srcs/django/ft_transcendence/staticfiles
+	rm -rf ./srcs/django/ft_transcendence/media/profile_pics
 	rm -rf ./srcs/certificates/*.*
 	rm -rf staticfiles
 
