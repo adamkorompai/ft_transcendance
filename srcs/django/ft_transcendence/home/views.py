@@ -18,8 +18,6 @@ def welcome(request):
 		"show_alert": True,
 		"all_users": User.objects.all(),
 	}
-	log.info("In welcome views")
-	log.info(request.META)
 	if 'HTTP_SPA_CHECK' in request.META:
 		html = render_block_to_string('welcome.html', 'body', context)
 		return HttpResponse(json.dumps({"html": html, "title": "Home"}), content_type="application/json")

@@ -3,6 +3,7 @@
 *.DS_Store
 *.crt
 *.key
+.venv/
 
 */migrations/*
 !*/migrations/__init__.py

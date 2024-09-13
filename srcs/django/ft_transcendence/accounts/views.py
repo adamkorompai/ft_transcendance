@@ -92,7 +92,8 @@ def login_v(request) -> HttpResponse:
             user = form.get_user()
             user.profile.active = True
             login(request, user)
-            return redirect('home:welcome')
+            context['just_logged_in'] = True
+            return render(request, 'welcome.html', context)
     else: # GET request
         form = AuthenticationForm()
     context['form'] = form

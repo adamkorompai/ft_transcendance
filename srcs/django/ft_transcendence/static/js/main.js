@@ -37,6 +37,25 @@ container.addEventListener('click', (event) => {
     }
 })
 
+// Call this function after successful login and page reload
+document.addEventListener('DOMContentLoaded', () => {
+    const h1Element = document.querySelector('h1.logged-in');
+    if (h1Element) {
+        saveHomePageState();
+    }
+});
+
+// Function to save home page state after login
+function saveHomePageState() {
+    const homePageContent = {
+        html: document.getElementById("app-root").innerHTML,
+        title: document.title
+    };
+
+    // Push the home page state to browser history
+    window.history.pushState(homePageContent, homePageContent.title, "/");
+}
+
 // replaces default links behaviour with the following:
 // Fetch to get new content, swap UI, save state to browser history
 async function handleNaviguation(event) {
@@ -82,6 +101,7 @@ window.addEventListener('popstate', function (event) {
         updateUI(state, "app-root") // what if target is app-body?
     }
 })
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                  Pong                                      //

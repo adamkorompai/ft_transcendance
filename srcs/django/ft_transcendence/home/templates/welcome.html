@@ -7,7 +7,7 @@
 
 {% block body %}
 	<div class="mx-3 mx-md-0">
-		<h1>Welcome to Transcendance!</h1>
+		<h1 class="{% if just_logged_in %}logged-in{% endif %}">Welcome to Transcendance!</h1>
 		<p>A modern version of the classic video game Pong which simulates table tennis.</p>
 		<img
 			class="rounded mb-3 mt-3"

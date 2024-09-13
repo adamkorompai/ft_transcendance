@@ -1,3 +1,4 @@
+from pathlib import Path
 from datetime import datetime, timedelta
 from cryptography import x509
 from cryptography.x509.oid import NameOID
@@ -5,6 +6,15 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
 from cryptography.hazmat.backends import default_backend
+
+# Get the directory of the current script
+script_dir = Path(__file__).resolve().parent
+
+# Define the output directory
+output_dir = script_dir.parents[1] / "certificates"
+
+# Create the output directory if it doesn't exist
+output_dir.mkdir(parents=True, exist_ok=True)
 
 # Générer une clé privée RSA
 private_key = rsa.generate_private_key(
@@ -61,8 +71,10 @@ private_key_pem = private_key.private_bytes(
 cert_pem = cert.public_bytes(Encoding.PEM)
 
 # Écrire la clé privée et le certificat dans des fichiers
-with open("../../../certificates/key.pem", "wb") as key_file:
+key_filepath = output_dir / "key.pem"
+cert_filepath = output_dir / "cert.pem"
+with open(key_filepath, "wb") as key_file:
     key_file.write(private_key_pem)
 
-with open("../../../certificates/cert.pem", "wb") as cert_file:
+with open(cert_filepath, "wb") as cert_file:
     cert_file.write(cert_pem)
