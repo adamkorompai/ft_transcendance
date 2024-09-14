@@ -234,8 +234,11 @@ Chat
     function onBlockedUnblocked(action, fromChat) {
 
         if (fromChat === "true") {
+          console.log("FROM ChAT")
             // redirect to global chat page
             redirectToPage("/chatapp/");
+        } else {
+          console.log("NOT FROM CHAT")
         }
     }
 

@@ -256,7 +256,7 @@ async function blockUnblock(id, action, fromChat) {
 function onBlockedUnblocked(action, fromChat) {
     if (fromChat === "true") {
         // redirect to chat page
-        window.location.href = `${url}`;
+        window.location.href = "/chatapp/";
     }
     var status_bar = document.getElementById("header_status_bar");
     status_bar.innerHTML = ""
