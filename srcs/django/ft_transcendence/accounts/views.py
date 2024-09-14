@@ -143,7 +143,8 @@ def callback(request) -> None:
             if 'next' in request.POST:
                 return redirect(request.POST.get('next'))
             else:
-                return redirect('home:welcome')
+                context = {'just_logged_in': True}
+                return render(request, 'welcome.html', context)
         else:
             if page_origin == FROMLOGIN:
                 messages.warning(request, "The account you're trying to connect to was created without 42intra. Please enter your credentials to log in.")
